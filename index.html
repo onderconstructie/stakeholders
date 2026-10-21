@@ -126,9 +126,9 @@
 
         /* Main container */
         .container {
-            max-width: 1400px;
+            max-width: none;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1.5rem clamp(1rem, 2.5vw, 2.5rem);
         }
 
         /* Project name */
@@ -166,10 +166,15 @@
         /* Main layout - 3 columns on desktop */
         .main-grid {
             display: grid;
-            grid-template-columns: 300px 1fr 320px;
+            grid-template-columns: clamp(260px, 22vw, 340px) minmax(0, 1fr) clamp(280px, 24vw, 380px);
+            grid-template-areas: "form matrix list";
             gap: 1.5rem;
             align-items: stretch;
         }
+
+        .main-grid > .card:first-child { grid-area: form; }
+        .main-grid > .matrix-card { grid-area: matrix; }
+        .main-grid > .list-card { grid-area: list; }
 
         /* Card */
         .card {
@@ -407,7 +412,8 @@
         .matrix-wrapper {
             position: relative;
             width: 100%;
-            max-width: 520px;
+            /* zo groot als de kolom toelaat, maar altijd volledig in beeld */
+            max-width: max(320px, calc(100vh - 260px));
             margin: 0 auto;
             padding: 2rem 2.5rem 2.5rem 2.5rem;
         }
@@ -750,12 +756,7 @@
         @media (max-width: 1100px) {
             .main-grid {
                 grid-template-columns: 1fr 1fr;
-            }
-
-            .main-grid > .card:first-child {
-                grid-column: 1 / -1;
-                max-width: 440px;
-                margin: 0 auto;
+                grid-template-areas: "form list" "matrix matrix";
             }
 
             .main-grid > .card {
@@ -766,10 +767,7 @@
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .main-grid > .card:first-child {
-                max-width: none;
+                grid-template-areas: "form" "matrix" "list";
             }
 
             .header {
