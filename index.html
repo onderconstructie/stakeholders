@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stakeholder Radar — Wie beïnvloedt jouw project?</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>Stakeholder Radar – Onder Constructie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%2310b981' stroke-width='1.5' rx='2'/%3E%3Cline x1='16' y1='5' x2='16' y2='27' stroke='%2310b981' stroke-width='1'/%3E%3Cline x1='5' y1='16' x2='27' y2='16' stroke='%2310b981' stroke-width='1'/%3E%3Ccircle cx='22' cy='10' r='2.5' fill='%2310b981'/%3E%3C/svg%3E">
     <style>
         :root {
@@ -51,7 +55,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
             background: var(--slate-50);
             color: var(--slate-700);
             line-height: 1.5;
@@ -459,7 +463,7 @@
         /* Quadrant labels inside matrix */
         .quadrant-label {
             position: absolute;
-            font-size: 0.625rem;
+            font-size: 0.6875rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -546,7 +550,7 @@
             height: 16px;
             background: var(--slate-700);
             color: var(--white);
-            font-size: 0.5625rem;
+            font-size: 0.6875rem;
             font-weight: 700;
             border-radius: 50%;
             display: flex;
@@ -790,6 +794,25 @@
                 padding: 1.5rem;
             }
         }
+    
+        /* Onder Constructie: gedeelde footer en quote (huisstijl) */
+        footer.oc-footer {
+            text-align: center;
+            padding: 2rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #10b981;
+        }
+
+        footer.oc-footer .oc-quote {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            color: #10b981;
+            opacity: 1;
+            font-style: normal;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -939,8 +962,8 @@
         </div>
     </div>
 
-    <footer class="footer">
-        <span class="footer-quote">Begrijp wie ertoe doet, en geef aandacht waar het telt.</span>
+    <footer class="footer oc-footer">
+        <p class="quote oc-quote">Begrijp wie ertoe doet, en geef aandacht waar het telt.</p>
     </footer>
 
     <div class="tooltip" id="tooltip"></div>
