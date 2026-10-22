@@ -972,10 +972,186 @@
 
     <div class="tooltip" id="tooltip"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <script>
+/* ---------- Download als afbeelding of PDF (gedeeld door de Onder Constructie-tools, v2) ----------
+   Gebruik:
+     ocExport.png(bouwFn, 'bestandsnaam', { landscape:true })
+     ocExport.pdf(bouwFn, 'bestandsnaam', { landscape:true })
+   bouwFn() geeft { node, title, subtitle } terug: een DOM-knoop met inline styles, zonder knoppen of invoervelden.
+   Die komt buiten beeld op een witte pagina met kop (titel, ondertitel, datum) en voet.
+   Zet data-oc-keep op blokken die in een PDF niet over twee pagina's gesplitst mogen worden
+   (een beslissing, een kaartje, een rij); ze schuiven dan door naar de volgende pagina.
+   html2canvas en jsPDF worden pas geladen bij de eerste download, van dezelfde adressen als de
+   andere tools, zodat de app ze offline kan bewaren. */
+const ocExport = (() => {
+  const LIBS = {
+    h2c: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+    pdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+  };
+  const A4 = { w: 210, h: 297 }, MARGIN = 10;   // mm
+  const loaded = {};
+  function load(url) {
+    if (!loaded[url]) loaded[url] = new Promise((ok, fail) => {
+      const s = document.createElement('script');
+      s.src = url; s.onload = ok; s.onerror = () => { delete loaded[url]; fail(new Error('laden mislukt')); };
+      document.head.appendChild(s);
+    });
+    return loaded[url];
+  }
+  const today = () => new Date().toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+  function page(content, { title, subtitle, width }) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;background:#fff;padding:36px 40px 28px;
+      font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:#1e293b;-webkit-font-smoothing:antialiased;box-sizing:border-box;`;
+    const head = document.createElement('div');
+    head.style.cssText = 'display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border-bottom:2px solid #10b981;padding-bottom:12px;margin-bottom:20px;';
+    head.innerHTML = `<div><div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#1e293b"></div>
+      <div style="font-size:14px;color:#64748b;margin-top:2px"></div></div>
+      <div style="font-size:12px;color:#94a3b8;white-space:nowrap">${today()}</div>`;
+    head.children[0].children[0].textContent = title || '';
+    head.children[0].children[1].textContent = subtitle || '';
+    const foot = document.createElement('div');
+    foot.style.cssText = 'margin-top:22px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;';
+    foot.innerHTML = '<span>Onder Constructie</span><span>onderconstructie.github.io</span>';
+    wrap.append(head, content, foot);
+    document.body.appendChild(wrap);
+    return wrap;
+  }
+  // Schuift blokken met data-oc-keep die over een paginagrens zouden vallen naar de volgende pagina.
+  function keepTogether(wrap, pageH) {
+    const top0 = () => wrap.getBoundingClientRect().top;
+    for (const el of wrap.querySelectorAll('[data-oc-keep]')) {
+      const r = el.getBoundingClientRect(), t = r.top - top0(), b = t + r.height;
+      if (r.height > pageH * 0.85) continue;            // te groot om heel te houden
+      const boundary = Math.ceil(t / pageH) * pageH;     // eerstvolgende grens na de bovenkant
+      if (t % pageH !== 0 && b > boundary && t < boundary) {
+        const gap = document.createElement('div');
+        gap.style.cssText = `height:${boundary - t + 6}px;`;
+        el.parentNode.insertBefore(gap, el);
+      }
+    }
+  }
+  async function canvasOf(build, opts) {
+    await load(LIBS.h2c);
+    const built = build();
+    const node = page(built.node, { title: built.title, subtitle: built.subtitle, width: opts.width });
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      if (opts.pageH) keepTogether(node, opts.pageH);
+      return await window.html2canvas(node, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+    } finally { node.remove(); }
+  }
+  function save(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+  const widthFor = opts => opts.width || (opts.landscape ? 1120 : 800);
+  async function png(build, name, opts = {}) {
+    const c = await canvasOf(build, { width: widthFor(opts) });
+    await new Promise(ok => c.toBlob(b => { save(b, name + '.png'); ok(); }, 'image/png'));
+  }
+  async function pdf(build, name, opts = {}) {
+    const landscape = !!opts.landscape, width = widthFor(opts);
+    const pw = landscape ? A4.h : A4.w, ph = landscape ? A4.w : A4.h, w = pw - 2 * MARGIN;
+    const pageCss = (ph - 2 * MARGIN) / w * width;       // paginahoogte in CSS-pixels van de exportknoop
+    const [c] = await Promise.all([canvasOf(build, { width, pageH: pageCss }), load(LIBS.pdf)]);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: landscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4' });
+    const scale = w / c.width, pageH = (ph - 2 * MARGIN) / scale;   // paginahoogte in canvaspixels
+    for (let y = 0, i = 0; y < c.height - 2; y += pageH, i++) {
+      const h = Math.min(pageH, c.height - y);
+      const part = document.createElement('canvas'); part.width = c.width; part.height = h;
+      part.getContext('2d').drawImage(c, 0, y, c.width, h, 0, 0, c.width, h);
+      if (i) doc.addPage();
+      doc.addImage(part.toDataURL('image/jpeg', 0.92), 'JPEG', MARGIN, MARGIN, w, h * scale);
+    }
+    save(doc.output('blob'), name + '.pdf');
+  }
+  return { png, pdf };
+})();
+
+        const FILE_PREFIX = 'stakeholders', EXPORT_TITLE = 'Stakeholder Radar', ITEM_ONE = "stakeholder", ITEM_MANY = "stakeholders";
+        const ITEMS = () => stakeholders;
+        /* ---------- Downloads in de gedeelde Onder Constructie-layout ---------- */
+        const ocEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+        function ocKebab(s) {
+            return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+        function ocFileName(prefix) {
+            const p = ocKebab(document.getElementById('projectName').value);
+            return [prefix, p, new Date().toISOString().slice(0, 10)].filter(Boolean).join('-');
+        }
+        // Korte terugmelding op de knop zelf: deze tool heeft geen meldingenbalk.
+        function ocFlash(btn, text, ms = 2200) {
+            if (!btn.dataset.label) btn.dataset.label = btn.innerHTML;
+            btn.innerHTML = ocEsc(text);
+            clearTimeout(btn._ocT);
+            if (ms) btn._ocT = setTimeout(() => { btn.innerHTML = btn.dataset.label; btn.disabled = false; }, ms);
+        }
+        // Kloon van de matrix op een vaste breedte, met de punten en labels zoals op het scherm.
+        function ocMatrixClone(width) {
+            const src = document.querySelector('.matrix-wrapper');
+            // labels worden in pixels geplaatst: eerst op exportbreedte tekenen, dan klonen, dan terugzetten
+            const prev = src.getAttribute('style');
+            src.style.width = width + 'px'; src.style.maxWidth = 'none'; src.style.padding = '2rem 2.5rem 2.5rem 2.5rem';
+            renderMatrix();
+            const clone = src.cloneNode(true);
+            if (prev === null) src.removeAttribute('style'); else src.setAttribute('style', prev);
+            renderMatrix();
+            clone.removeAttribute('id');
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            clone.style.cssText = `width:${width}px;max-width:none;margin:0;padding:2rem 2.5rem 2.5rem 2.5rem;`;
+            return clone;
+        }
+        async function ocDownload(kind, btn) {
+            if (!ITEMS().length) { ocFlash(btn, 'Nog niets om te downloaden'); return; }
+            btn.disabled = true; ocFlash(btn, 'Bezig…', 0);
+            try {
+                await (kind === 'png' ? ocExport.png(buildExport, ocFileName(FILE_PREFIX), { landscape:true })
+                                      : ocExport.pdf(buildExport, ocFileName(FILE_PREFIX), { landscape:true }));
+                ocFlash(btn, kind === 'png' ? 'Afbeelding gedownload' : 'PDF gedownload');
+            } catch (e) {
+                ocFlash(btn, 'Downloaden lukt nu niet: geen verbinding?', 3500);
+            }
+        }
+        function buildExport() {
+            const node = document.createElement('div');
+            node.style.cssText = 'display:grid;grid-template-columns:600px 1fr;gap:32px;align-items:start;';
+            const left = document.createElement('div');
+            left.appendChild(ocMatrixClone(600));
+            const right = document.createElement('div');
+            right.innerHTML = EXPORT_LIST();
+            node.append(left, right);
+            const name = document.getElementById('projectName').value.trim() || 'Zonder projectnaam';
+            const n = ITEMS().length;
+            return { node, title: EXPORT_TITLE, subtitle: `${name} · ${n} ${n === 1 ? ITEM_ONE : ITEM_MANY}` };
+        }
+        function ocGroupHTML(color, textColor, title, sub, rows) {
+            if (!rows.length) return '';
+            return `<div style="margin-bottom:18px">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${textColor}">
+                    <span style="width:9px;height:9px;border-radius:50%;background:${color}"></span>${ocEsc(title)}
+                    <span style="font-weight:500;letter-spacing:0;text-transform:none;color:#94a3b8">· ${ocEsc(sub)}</span></div>
+                ${rows.map(r => `<div data-oc-keep style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:14px;color:#1e293b">
+                    <span>${ocEsc(r.name)}</span><span style="white-space:nowrap;font-size:12px;color:#64748b">${ocEsc(r.meta)}</span></div>`).join('')}
+            </div>`;
+        }
+
+        function EXPORT_LIST() {
+            const groups = [
+                { name:'Nauw betrekken',  sub:'veel macht, veel belang',   color:'#ef4444', text:'#dc2626' },
+                { name:'Tevreden houden', sub:'veel macht, weinig belang', color:'#f97316', text:'#ea580c' },
+                { name:'Goed informeren', sub:'weinig macht, veel belang', color:'#3b82f6', text:'#2563eb' },
+                { name:'Monitoren',       sub:'weinig macht en belang',    color:'#94a3b8', text:'#64748b' }
+            ];
+            return groups.map(g => ocGroupHTML(g.color, g.text, g.name, g.sub,
+                stakeholders.filter(s => getQuadrant(s.power, s.interest).name === g.name)
+                     .sort((a, b) => (b.power + b.interest) - (a.power + a.interest))
+                     .map(s => ({ name: s.name, meta: `macht ${s.power} · belang ${s.interest}` })))).join('');
+        }
         let stakeholders = [];
 
         // Padding percentage to keep points away from edges
@@ -1281,48 +1457,9 @@
             renderStakeholderList();
         }
 
-        async function downloadPng() {
-            const name = document.getElementById('projectName').value || 'Stakeholder Radar';
-            const matrix = document.querySelector('.matrix-wrapper');
+        function downloadPng(e) { return ocDownload('png', e.currentTarget); }
 
-            const canvas = await html2canvas(matrix, {
-                backgroundColor: '#ffffff',
-                scale: 2
-            });
-
-            const link = document.createElement('a');
-            link.download = `${name.toLowerCase().replace(/\s+/g, '-')}-stakeholders.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-
-        async function downloadPdf() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('l', 'mm', 'a4');
-            const name = document.getElementById('projectName').value || 'Stakeholder Radar';
-            const date = new Date().toLocaleDateString('nl-NL');
-            const matrix = document.querySelector('.matrix-wrapper');
-
-            const canvas = await html2canvas(matrix, {
-                backgroundColor: '#ffffff',
-                scale: 2
-            });
-
-            pdf.setFontSize(18);
-            pdf.setTextColor(30, 41, 59);
-            pdf.text(`Stakeholderanalyse: ${name}`, 148.5, 18, { align: 'center' });
-
-            pdf.setFontSize(11);
-            pdf.setTextColor(100, 116, 139);
-            pdf.text(`${date}`, 148.5, 26, { align: 'center' });
-
-            const imgWidth = 160;
-            const imgHeight = 160;
-            const imgX = (297 - imgWidth) / 2;
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', imgX, 35, imgWidth, imgHeight);
-
-            pdf.save(`${name.toLowerCase().replace(/\s+/g, '-')}-stakeholders.pdf`);
-        }
+        function downloadPdf(e) { return ocDownload('pdf', e.currentTarget); }
 
         function downloadCsv() {
             const name = document.getElementById('projectName').value || 'Stakeholder Radar';
