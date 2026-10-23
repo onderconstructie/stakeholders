@@ -958,6 +958,19 @@
         .axis-label:hover, .axis-label:focus-visible { color:#047857; border-color:#047857; }
         .slider-hints { gap:0.75rem; }
         .slider-hints span:last-child { text-align:right; }
+        /* Melding met Ongedaan, en de tekstknop "Opnieuw beginnen" */
+        .oc-toast { position: fixed; left: 50%; bottom: 1.25rem; transform: translate(-50%, calc(100% + 3rem)); visibility: hidden; z-index: 10002;
+            background: #1e293b; color: #ffffff; border-radius: 12px; padding: 0.375rem 0.375rem 0.375rem 1rem; min-height: 44px;
+            display: flex; align-items: center; gap: 0.75rem; font-size: 0.9375rem; box-shadow: 0 10px 30px rgba(15,23,42,0.25);
+            transition: transform 0.25s ease, visibility 0s 0.25s; max-width: calc(100% - 2rem); font-family: inherit; }
+        .oc-toast.show { transform: translate(-50%, 0); visibility: visible; transition: transform 0.25s ease; }
+        .oc-toast:not(.has-undo) { padding-right: 1rem; }
+        .oc-toast span { min-width: 0; }
+        .oc-toast button { font: inherit; font-weight: 600; color: #6ee7b7; background: transparent; border: 0; min-height: 44px; padding: 0 0.75rem; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        .oc-toast button:hover { background: rgba(255,255,255,0.08); }
+        .restart-row { display: flex; justify-content: center; margin-top: 1.25rem; }
+        .restart-btn { min-height: 44px; padding: 0.5rem 1rem; font: inherit; font-size: 0.875rem; font-weight: 500; color: #64748b; background: none; border: 0; border-radius: 10px; cursor: pointer; text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 3px; }
+        .restart-btn:hover { color: #b91c1c; background: #fef2f2; text-decoration-color: currentColor; }
     </style>
 </head>
 <body>
@@ -1114,6 +1127,7 @@
                 </div>
             </div>
         </div>
+        <div class="restart-row"><button type="button" class="restart-btn" id="ocRestart" title="Alles wissen en opnieuw beginnen">Opnieuw beginnen</button></div>
     </div>
 
     <footer class="footer oc-footer">
@@ -1521,12 +1535,51 @@ const ocExport = (() => {
             clearTimeout(note._t); note._t = setTimeout(() => { note.hidden = true; }, 6000);
         }
 
+        /* Melding met Ongedaan (6 s) */
+        const ocToast = (() => {
+            let el = null, timer = null, undoFn = null;
+            function ensure() {
+                if (el) return el;
+                el = document.createElement('div');
+                el.className = 'oc-toast'; el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite');
+                el.innerHTML = '<span></span><button type="button" hidden>Ongedaan</button>';
+                el.querySelector('button').addEventListener('click', () => { const f = undoFn; undoFn = null; el.classList.remove('show'); if (f) f(); });
+                document.body.appendChild(el);
+                return el;
+            }
+            return function (msg, undo) {
+                const t = ensure();
+                undoFn = typeof undo === 'function' ? undo : null;
+                t.querySelector('span').textContent = msg;
+                t.querySelector('button').hidden = !undoFn;
+                t.classList.toggle('has-undo', !!undoFn);
+                t.classList.add('show');
+                clearTimeout(timer);
+                timer = setTimeout(() => { t.classList.remove('show'); undoFn = null; }, undoFn ? 6000 : 2600);
+            };
+        })();
+        /* Kopie van alle sleutels uit oc:opslag, om "Alles wissen" ongedaan te kunnen maken */
+        function ocStoreSnapshot() {
+            const spec = ((document.querySelector('meta[name="oc:opslag"]') || {}).content || '').split(',').map(x => x.trim()).filter(Boolean);
+            const out = {};
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (spec.some(p => p.endsWith('*') ? k.startsWith(p.slice(0, -1)) : k === p)) out[k] = localStorage.getItem(k);
+                }
+            } catch (e) {}
+            return out;
+        }
+        function ocStoreRestore(snap) {
+            Object.keys(snap).forEach(k => { try { localStorage.setItem(k, snap[k]); } catch (e) {} });
+        }
+
         /* Bevestiging in de pagina, in plaats van confirm() */
         function ocConfirmWipe() {
             return new Promise(resolve => {
                 const back = document.createElement('div');
                 back.className = 'ocw-back';
-                back.innerHTML = '<div class="ocw" role="alertdialog" aria-modal="true"><p>Alles wissen? Dit kan je niet ongedaan maken.</p>' +
+                back.innerHTML = '<div class="ocw" role="alertdialog" aria-modal="true"><p>Alles wissen? Je kan dit nog ongedaan maken tot je iets anders doet.</p>' +
                     '<div class="ocw-actions"><button type="button" class="ocw-btn ocw-cancel">Annuleer</button>' +
                     '<button type="button" class="ocw-btn ocw-ok">Wis alles</button></div></div>';
                 const prev = document.activeElement;
@@ -1863,10 +1916,37 @@ const ocExport = (() => {
             renderStakeholderList();
         }
 
+        /* Eén stakeholder: meteen weg, met Ongedaan (zelfde plaats in de lijst) */
         function deleteStakeholder(index) {
+            const removed = stakeholders[index];
+            if (!removed) return;
             stakeholders.splice(index, 1);
             renderMatrix();
             renderStakeholderList();
+            ocToast(`${removed.name} verwijderd`, () => {
+                stakeholders.splice(Math.min(index, stakeholders.length), 0, removed);
+                renderMatrix();
+                renderStakeholderList();
+            });
+        }
+
+        /* Alles wissen, met Ongedaan zolang er intussen niets veranderde */
+        const stateSig = () => JSON.stringify([document.getElementById('projectName').value, stakeholders]);
+        async function wipeAll() {
+            if (!(await ocConfirmWipe())) return;
+            const snap = ocStoreSnapshot();
+            reset();
+            const sig = stateSig();
+            ocToast('Alles gewist', () => {
+                if (stateSig() !== sig) { ocToast('Ongedaan maken kan niet meer: er is intussen iets veranderd'); return; }
+                ocStoreRestore(snap);
+                stakeholders = [];
+                loadState();
+                renderMatrix();
+                renderStakeholderList();
+                updateImportBtn();
+                ocToast('Teruggezet');
+            });
         }
 
         function reset() {
@@ -1962,7 +2042,8 @@ const ocExport = (() => {
                 if (e.key === 'Enter') addStakeholder();
             });
 
-            document.getElementById('resetBtn').addEventListener('click', async () => { if (await ocConfirmWipe()) reset(); });
+            document.getElementById('resetBtn').addEventListener('click', wipeAll);
+            document.getElementById('ocRestart').addEventListener('click', wipeAll);
             document.getElementById('downloadPng').addEventListener('click', downloadPng);
             document.getElementById('downloadPdf').addEventListener('click', downloadPdf);
             document.getElementById('downloadCsv').addEventListener('click', downloadCsv);
