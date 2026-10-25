@@ -14,7 +14,7 @@
     <meta name="oc:traject" content="verandering:1">
     <meta name="oc:opslag" content="stakeholders.v1, stakeholders.migratie-gemeld, oc.share.stakeholders">
 <link rel="stylesheet" href="/fonts/fonts.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E %3Crect x=&quot;6&quot; y=&quot;6&quot; width=&quot;28&quot; height=&quot;28&quot; fill=&quot;none&quot; stroke=&quot;%23cbd5e1&quot; stroke-width=&quot;1.5&quot; rx=&quot;2&quot;/%3E %3Cline x1=&quot;20&quot; y1=&quot;6&quot; x2=&quot;20&quot; y2=&quot;34&quot; stroke=&quot;%23cbd5e1&quot; stroke-width=&quot;1.5&quot;/%3E %3Cline x1=&quot;6&quot; y1=&quot;20&quot; x2=&quot;34&quot; y2=&quot;20&quot; stroke=&quot;%23cbd5e1&quot; stroke-width=&quot;1.5&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;12&quot; r=&quot;3&quot; fill=&quot;%2310b981&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;2.5&quot; fill=&quot;%23cbd5e1&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;28&quot; r=&quot;2.5&quot; fill=&quot;%23cbd5e1&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;28&quot; r=&quot;2&quot; fill=&quot;%23cbd5e1&quot;/%3E %3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;18&quot; fill=&quot;%23f8fafc&quot; stroke=&quot;%23e2e8f0&quot; stroke-width=&quot;1.5&quot;/%3E%3Crect x=&quot;20.5&quot; y=&quot;9&quot; width=&quot;10.5&quot; height=&quot;11&quot; rx=&quot;2&quot; fill=&quot;%23a7f3d0&quot;/%3E%3Cpath d=&quot;M10 9v21h21&quot; stroke=&quot;%23334155&quot; stroke-width=&quot;2.4&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/%3E%3Ccircle cx=&quot;25.8&quot; cy=&quot;14.5&quot; r=&quot;3.6&quot; fill=&quot;%2310b981&quot;/%3E%3Ccircle cx=&quot;15.5&quot; cy=&quot;16&quot; r=&quot;2.6&quot; fill=&quot;%2394a3b8&quot;/%3E%3Ccircle cx=&quot;24.5&quot; cy=&quot;25&quot; r=&quot;2.6&quot; fill=&quot;%2394a3b8&quot;/%3E%3C/svg%3E">
     <style>
         :root {
             --slate-50: #f8fafc;
@@ -621,8 +621,6 @@
             flex-direction: column;
             gap: 0.5rem;
             flex: 1;
-            overflow-y: auto;
-            max-height: 380px;
         }
 
         .stakeholder-list::-webkit-scrollbar {
@@ -956,6 +954,54 @@
         .axis-label:hover, .axis-label:focus-visible { color:#047857; border-color:#047857; }
         .slider-hints { gap:0.75rem; }
         .slider-hints span:last-child { text-align:right; }
+        /* Panel november 2026: aslabels als tekst, kwadrantkleuren zonder blauw, tikdoelen, voorbeeld */
+        .axis-label { background:none; border:0; padding:0.375rem 0.25rem; color:#475569; text-decoration:underline dotted #94a3b8; text-underline-offset:4px; }
+        .axis-label:hover, .axis-label:focus-visible { background:none; color:#047857; text-decoration-color:#047857; }
+        .axis-label::before { inset:-8px -6px; }
+        .quadrant-bg.q-tr { background:#d1fae5; }
+        .quadrant-bg.q-br { background:#ecfdf5; }
+        .quadrant-label { max-width:46%; line-height:1.25; }
+        .quadrant-label.q-tr { color:#065f46; }
+        .quadrant-label.q-br { color:#047857; }
+        .point-dot.q-manage, .legend-item.q-manage .legend-dot { background:#047857; }
+        .point-dot.q-inform, .legend-item.q-inform .legend-dot { background:#10b981; }
+        .legend-item.q-manage { background:#d1fae5; }
+        .legend-item.q-inform { background:#ecfdf5; }
+        .legend-item.q-manage, .stakeholder-strategy.q-manage { color:#065f46; }
+        .legend-item.q-inform, .stakeholder-strategy.q-inform { color:#047857; }
+        .stakeholder-item.q-manage { border-left-color:#047857; background:#d1fae5; }
+        .stakeholder-item.q-inform { border-left-color:#10b981; background:#ecfdf5; }
+        .project-name-input { min-height:44px; }
+        .sh-pos select { min-height:44px; padding:0 0.375rem; }
+        .stakeholder-next { min-height:44px; }
+        .stakeholder-meta { gap:0.375rem 0.625rem; }
+        .stakeholder-item { position:relative; align-items:flex-start; }
+        .stakeholder-delete { position:absolute; top:0.25rem; right:0.25rem; margin:0; }
+        .stakeholder-name { padding-right:2.25rem; }
+        .sh-pos { font-size:0.75rem; }
+        @media (max-width:480px) {
+            .matrix-card { padding:1rem 0.75rem; }
+            .matrix-wrapper { padding:2rem 0.25rem 2.5rem; }
+        }
+        @media (min-width:1101px) {
+            .matrix-card { justify-content:flex-start; }
+            .matrix-wrapper { position:sticky; top:1rem; }
+        }
+        .download-row .btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .download-row { flex-wrap:wrap; }
+        .download-row .btn { white-space:nowrap; flex:1 1 auto; padding:0 0.625rem; }
+        @media (max-width:420px) { .download-row .btn svg { display:none; } }
+        .vb-start { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:0.5rem 0.75rem; margin:0 auto 1.25rem; max-width:720px; font-size:0.875rem; color:#475569; text-align:center; }
+        .vb-start[hidden], .vb-bar[hidden] { display:none !important; }
+        .btn-s { min-height:44px; padding:0 0.875rem; border-radius:10px; border:1.5px solid #e2e8f0; background:#fff; font:inherit; font-size:0.875rem; font-weight:600; color:#047857; white-space:nowrap; cursor:pointer; }
+        .btn-s:hover { border-color:#a7f3d0; background:#ecfdf5; }
+        .vb-bar { display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem 0.75rem; margin:0 auto 1.25rem; max-width:900px; padding:0.5rem 0.5rem 0.5rem 0.75rem; background:#fffbeb; border:1px solid #fde68a; border-radius:12px; font-size:0.875rem; line-height:1.4; color:#78350f; }
+        .vb-bar svg { width:18px; height:18px; flex-shrink:0; color:#b45309; margin-top:1px; }
+        .vb-text { flex:1 1 14rem; min-width:0; display:flex; gap:0.5rem; align-items:flex-start; }
+        .vb-btns { display:flex; flex-wrap:wrap; gap:0.375rem; }
+        .vb-btn { min-height:44px; padding:0.375rem 0.625rem; border-radius:10px; font:inherit; font-size:0.875rem; font-weight:600; background:#fff; border:1px solid #e2e8f0; cursor:pointer; }
+        .vb-wis { color:#b91c1c; border-color:#fecaca; }
+        .vb-eigen { color:#047857; border-color:#a7f3d0; }
         /* Melding met Ongedaan, en de tekstknop "Opnieuw beginnen" */
         .oc-toast { position: fixed; left: 50%; bottom: 1.25rem; transform: translate(-50%, calc(100% + 3rem)); visibility: hidden; z-index: 10002;
             background: #1e293b; color: #ffffff; border-radius: 12px; padding: 0.375rem 0.375rem 0.375rem 1rem; min-height: 44px;
@@ -969,6 +1015,7 @@
         .restart-row { display: flex; justify-content: center; margin-top: 1.25rem; }
         .restart-btn { min-height: 44px; padding: 0.5rem 1rem; font: inherit; font-size: 0.875rem; font-weight: 500; color: #64748b; background: none; border: 0; border-radius: 10px; cursor: pointer; text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 3px; }
         .restart-btn:hover { color: #b91c1c; background: #fef2f2; text-decoration-color: currentColor; }
+        @media (min-width:769px) { .oc-toast { left:auto; right:1.25rem; max-width:360px; transform:translateY(calc(100% + 3rem)); } .oc-toast.show { transform:none; } }
     </style>
 </head>
 <body>
@@ -978,15 +1025,7 @@
             Projectmanagement
         </a>
         <div class="logo" aria-hidden="true">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="6" y="6" width="28" height="28" fill="none" stroke="#10b981" stroke-width="2" rx="2"/>
-                    <line x1="20" y1="6" x2="20" y2="34" stroke="#10b981" stroke-width="1.5"/>
-                    <line x1="6" y1="20" x2="34" y2="20" stroke="#10b981" stroke-width="1.5"/>
-                    <circle cx="28" cy="12" r="3.5" fill="#10b981"/>
-                    <circle cx="12" cy="12" r="2.5" fill="#10b981" opacity="0.5"/>
-                    <circle cx="28" cy="28" r="2.5" fill="#10b981" opacity="0.5"/>
-                    <circle cx="12" cy="28" r="2" fill="#10b981" opacity="0.3"/>
-                </svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><rect x="20.5" y="9" width="10.5" height="11" rx="2" fill="#a7f3d0"/><path d="M10 9v21h21" stroke="#334155" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="25.8" cy="14.5" r="3.6" fill="#10b981"/><circle cx="15.5" cy="16" r="2.6" fill="#94a3b8"/><circle cx="24.5" cy="25" r="2.6" fill="#94a3b8"/></svg>
         </div>
         <h1 class="title">Stakeholder Radar</h1>
         <p class="subtitle">Wie moet mee, en wil dat ook?</p>
@@ -999,6 +1038,15 @@
         <div class="migrate-note" id="migrateNote" role="status" hidden>
             <span>Assen gewijzigd naar bijdrage en bereidheid: controleer de bereidheid van je stakeholders.</span>
             <button type="button" id="migrateOk">Begrepen</button>
+        </div>
+
+        <div class="vb-start" id="vbStart" hidden>
+            <span>Begin links met een eerste stakeholder, of verken eerst een ingevuld voorbeeld.</span>
+            <button type="button" class="btn-s" id="vbLoad">Voorbeeld bekijken</button>
+        </div>
+        <div class="vb-bar" id="vbBar" role="note" hidden>
+            <div class="vb-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Dit is een voorbeeld om de tool te verkennen. Het telt niet mee in andere tools.</span></div>
+            <div class="vb-btns"><button type="button" class="vb-btn vb-wis" id="vbWis">Wis voorbeeld</button><button type="button" class="vb-btn vb-eigen" id="vbEigen">Maak er mijn eigen van</button></div>
         </div>
 
         <div class="main-grid">
@@ -1053,10 +1101,10 @@
 
                 <div class="legend-section">
                     <div class="legend-grid">
-                        <div class="legend-item q-manage"><span class="legend-dot"></span><span>Managen<span class="legend-tip">nauw samenwerken, mee laten beslissen</span></span></div>
-                        <div class="legend-item q-anticipate"><span class="legend-dot"></span><span>Anticiperen<span class="legend-tip">vroeg opzoeken, bezwaren leren kennen</span></span></div>
-                        <div class="legend-item q-inform"><span class="legend-dot"></span><span>Informeren<span class="legend-tip">op de hoogte houden, mening vragen</span></span></div>
-                        <div class="legend-item q-monitor"><span class="legend-dot"></span><span>Monitoren<span class="legend-tip">algemeen informeren, in het oog houden</span></span></div>
+                        <div class="legend-item q-manage"><span class="legend-dot"></span><span>Nauw betrekken<span class="legend-tip">samenwerken, mee laten beslissen</span></span></div>
+                        <div class="legend-item q-anticipate"><span class="legend-dot"></span><span>Vroeg opzoeken<span class="legend-tip">bezwaren leren kennen, betrekken bij keuzes</span></span></div>
+                        <div class="legend-item q-inform"><span class="legend-dot"></span><span>Op de hoogte houden<span class="legend-tip">geregeld informeren, mening vragen</span></span></div>
+                        <div class="legend-item q-monitor"><span class="legend-dot"></span><span>In het oog houden<span class="legend-tip">algemeen informeren, verschuivingen volgen</span></span></div>
                     </div>
                 </div>
             </div>
@@ -1072,10 +1120,10 @@
                             <div class="quadrant-bg q-br"></div>
                             <div class="grid-line horizontal"></div>
                             <div class="grid-line vertical"></div>
-                            <div class="quadrant-label q-tl">Anticiperen</div>
-                            <div class="quadrant-label q-tr">Managen</div>
-                            <div class="quadrant-label q-bl">Monitoren</div>
-                            <div class="quadrant-label q-br">Informeren</div>
+                            <div class="quadrant-label q-tl">Vroeg opzoeken</div>
+                            <div class="quadrant-label q-tr">Nauw betrekken</div>
+                            <div class="quadrant-label q-bl">In het oog houden</div>
+                            <div class="quadrant-label q-br">Op de hoogte houden</div>
                             <div id="pointsContainer"></div>
                         </div>
                     </div>
@@ -1107,13 +1155,13 @@
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
                                 <polyline points="21 15 16 10 5 21"/>
                             </svg>
-                            PNG
+                            Afbeelding
                         </button>
-                        <button class="btn btn-secondary" id="downloadPdf">
+                        <button class="btn btn-secondary" id="downloadPdf" type="button">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
                             PDF
                         </button>
-                        <button class="btn btn-secondary" id="downloadCsv">
+                        <button class="btn btn-secondary" id="downloadCsv" type="button">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
                             CSV
                         </button>
@@ -1407,7 +1455,7 @@ const ocExport = (() => {
             renderMatrix();
             clone.removeAttribute('id');
             clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-            clone.style.cssText = `width:${width}px;max-width:none;margin:0;padding:2rem 2.5rem 2.5rem 2.5rem;`;
+            clone.style.cssText = `position:relative;top:auto;width:${width}px;max-width:none;margin:0;padding:2rem 2.5rem 2.5rem 2.5rem;`;
             return clone;
         }
         async function ocDownload(kind, btn) {
@@ -1456,6 +1504,7 @@ const ocExport = (() => {
                     `<div style="margin-bottom:4px"><b style="color:${g.text}">${ocEsc(g.name)}</b>: ${ocEsc(g.tip)}</div>`).join('')}</div>`;
         }
         let stakeholders = [];
+        let isExample = false;   // voorbeelddata: bewaard met voorbeeld:true, nooit gedeeld met andere tools
 
         /* ---------- Opslag en delen ---------- */
         const STORE_KEY = 'stakeholders.v1';
@@ -1463,7 +1512,8 @@ const ocExport = (() => {
         function saveState() {
             if (!loaded) return;
             const project = document.getElementById('projectName').value;
-            try { localStorage.setItem(STORE_KEY, JSON.stringify({ model: 2, project, items: stakeholders })); } catch (e) {}
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({ model: 2, project, items: stakeholders }, isExample ? { voorbeeld: true } : {}))); } catch (e) {}
+            if (isExample) { ocShare.clear('stakeholders'); updateImportBtn(); return; }
             ocShare.publish('stakeholders', 'Stakeholder Radar', [{
                 name: project.trim() || 'Stakeholders',
                 items: stakeholders.map(x => ({ type: 'betrokkene', text: x.name, note: x.todo ? 'nog in te schatten' : qOf(x).name }))
@@ -1487,6 +1537,7 @@ const ocExport = (() => {
                 const d = JSON.parse(localStorage.getItem(STORE_KEY));
                 if (d && Array.isArray(d.items)) {
                     stakeholders = d.items.filter(x => x && x.name).map(normalize);
+                    isExample = d.voorbeeld === true && stakeholders.length > 0;
                     document.getElementById('projectName').value = d.project || '';
                     if (d.items.some(x => x && ('power' in x || 'interest' in x) && !('contribution' in x))) showMigrateNote();
                 }
@@ -1603,13 +1654,13 @@ const ocExport = (() => {
            Bijdrage: in hoeverre iemand het resultaat mee kan maken of breken (verticaal).
            Bereidheid: in hoeverre iemand de verandering wil steunen (horizontaal). */
         const QUADS = {
-            manage:     { name: 'Managen',     class: 'manage',     color: '#10b981', text: '#047857', sub: 'veel bijdrage, hoge bereidheid',
+            manage:     { name: 'Nauw betrekken', class: 'manage',  color: '#047857', text: '#065f46', sub: 'veel bijdrage, hoge bereidheid',
                           tip: 'Sleutelfiguren en beslissers. Werk nauw en geregeld met hen samen, laat ze meebeslissen, stem verwachtingen af en houd hun steun in het oog.' },
-            anticipate: { name: 'Anticiperen', class: 'anticipate', color: '#f97316', text: '#c2410c', sub: 'veel bijdrage, lage bereidheid',
+            anticipate: { name: 'Vroeg opzoeken', class: 'anticipate', color: '#f97316', text: '#c2410c', sub: 'veel bijdrage, lage bereidheid',
                           tip: 'Invloedrijk, maar (nog) niet mee, en hun belangen kunnen botsen met het project. Zoek ze vroeg zelf op, leer hun bezwaren kennen en betrek ze bij grote keuzes: wie je meekrijgt, kan een pleitbezorger worden.' },
-            inform:     { name: 'Informeren',  class: 'inform',     color: '#3b82f6', text: '#1d4ed8', sub: 'weinig bijdrage, hoge bereidheid',
+            inform:     { name: 'Op de hoogte houden', class: 'inform', color: '#10b981', text: '#047857', sub: 'weinig bijdrage, hoge bereidheid',
                           tip: 'Welwillend, met beperkte invloed. Houd ze geregeld op de hoogte en vraag hun mening; ze brengen vaak goede ideeën aan. Zorg dat niets hen overvalt.' },
-            monitor:    { name: 'Monitoren',   class: 'monitor',    color: '#94a3b8', text: '#64748b', sub: 'weinig bijdrage, lage bereidheid',
+            monitor:    { name: 'In het oog houden', class: 'monitor',    color: '#94a3b8', text: '#64748b', sub: 'weinig bijdrage, lage bereidheid',
                           tip: 'Weinig invloed en weinig betrokken. Algemene communicatie volstaat, maar volg of hun positie verschuift.' }
         };
         const HIGH = v => v >= 6;
@@ -1682,98 +1733,58 @@ const ocExport = (() => {
                 }
             });
 
-            // Calculate label positions with collision avoidance
+            // Labels plaatsen: standaard 10px boven de stip; botst dat met een ander label, een stip of
+            // een kwadranttitel, dan eronder, en daarna telkens een rij verder (met verbindingslijn).
             const labelPlacements = [];
             const LABEL_HEIGHT = 20;
-            const LABEL_PADDING = 6;
-            const POINT_OFFSET = 14;
+            const LABEL_PADDING = 4;
+            const DOT_R = 8, GAP = 10;
+            const POINT_OFFSET = DOT_R + GAP + LABEL_HEIGHT / 2;   // labelmidden: 10px vrij boven de stip
+            const STEP = LABEL_HEIGHT + LABEL_PADDING;
+            const box = (cx, cy, w, h) => ({ l: cx - w / 2, r: cx + w / 2, t: cy - h / 2, b: cy + h / 2 });
+            const overlap = (p, q) => Math.max(0, Math.min(p.r, q.r) - Math.max(p.l, q.l)) * Math.max(0, Math.min(p.b, q.b) - Math.max(p.t, q.t));
+            const obstacles = [];
+            document.querySelectorAll('#matrixContainer .quadrant-label').forEach(q => {
+                const r = q.getBoundingClientRect();
+                obstacles.push({ l: r.left - matrixRect.left - 2, r: r.right - matrixRect.left + 2, t: r.top - matrixRect.top - 2, b: r.bottom - matrixRect.top + 2 });
+            });
+            const dots = allPositions.map(p => box(p.xPercent / 100 * matrixWidth, p.yPercent / 100 * matrixHeight, 2 * DOT_R + 4, 2 * DOT_R + 4));
+            const measurer = document.createElement('span');
+            measurer.style.cssText = 'position:absolute;visibility:hidden;font-size:0.6875rem;font-weight:600;white-space:nowrap;padding:3px 6px;';
+            document.body.appendChild(measurer);
 
             allPositions.forEach((pos) => {
-                // Measure label width
-                const tempLabel = document.createElement('span');
-                tempLabel.style.cssText = 'position:absolute;visibility:hidden;font-size:0.6875rem;font-weight:600;white-space:nowrap;padding:3px 6px;';
-                tempLabel.textContent = pos.name;
-                document.body.appendChild(tempLabel);
-                const labelWidth = tempLabel.offsetWidth;
-                document.body.removeChild(tempLabel);
-
+                measurer.textContent = pos.name;
+                const labelWidth = measurer.offsetWidth;
                 const pointXPx = (pos.xPercent / 100) * matrixWidth;
                 const pointYPx = (pos.yPercent / 100) * matrixHeight;
-
-                // Determine label placement strategy based on position
-                let labelXPx = pointXPx;
-                let labelYPx = pointYPx - POINT_OFFSET;
-                let needsLeader = false;
-
-                // If point is near top edge, place label below
-                if (pos.yPercent < 20) {
-                    labelYPx = pointYPx + POINT_OFFSET + LABEL_HEIGHT;
-                    needsLeader = true;
-                }
-
-                // If point is near left edge, align label to right of point
-                if (pos.xPercent < 15) {
-                    labelXPx = pointXPx + labelWidth / 2 + 10;
-                }
-
-                // If point is near right edge, align label to left of point
-                if (pos.xPercent > 85) {
-                    labelXPx = pointXPx - labelWidth / 2 - 10;
-                }
-
-                // Check for collisions with existing labels
-                let attempts = 0;
-                const maxAttempts = 15;
-
-                while (attempts < maxAttempts) {
-                    let collision = false;
-
-                    for (const placed of labelPlacements) {
-                        const horizontalOverlap = Math.abs(labelXPx - placed.labelXPx) < (labelWidth + placed.labelWidth) / 2 + 4;
-                        const verticalOverlap = Math.abs(labelYPx - placed.labelYPx) < LABEL_HEIGHT + LABEL_PADDING;
-
-                        if (horizontalOverlap && verticalOverlap) {
-                            collision = true;
-                            // Move label up or down depending on position
-                            if (pos.yPercent < 50) {
-                                labelYPx += (LABEL_HEIGHT + LABEL_PADDING);
-                            } else {
-                                labelYPx -= (LABEL_HEIGHT + LABEL_PADDING);
-                            }
-                            needsLeader = true;
-                            break;
+                const minX = labelWidth / 2 + 2, maxX = matrixWidth - labelWidth / 2 - 2;
+                const minY = LABEL_HEIGHT / 2 + 2, maxY = matrixHeight - LABEL_HEIGHT / 2 - 2;
+                const dirs = pos.yPercent < 20 ? [1, -1] : [-1, 1];
+                const shifts = [0, -(labelWidth / 2 - 14), labelWidth / 2 - 14];
+                let best = null;
+                for (let k = 0; k < 8 && !(best && best.cost === 0); k++) {
+                    for (const d of dirs) {
+                        const cy = pointYPx + d * (POINT_OFFSET + k * STEP);
+                        if (cy < minY || cy > maxY) continue;
+                        for (const sh of shifts) {
+                            const cx = Math.max(minX, Math.min(maxX, pointXPx + sh));
+                            const bx = box(cx, cy, labelWidth + 4, LABEL_HEIGHT + LABEL_PADDING);
+                            let cost = 0;
+                            labelPlacements.forEach(q => { cost += overlap(bx, box(q.labelXPx, q.labelYPx, q.labelWidth + 4, LABEL_HEIGHT + LABEL_PADDING)); });
+                            dots.forEach(o => { cost += overlap(bx, o) * 2; });
+                            obstacles.forEach(o => { cost += overlap(bx, o) * 1.5; });
+                            cost += k * 0.01;   // bij gelijke stand: zo dicht mogelijk
+                            if (!best || cost < best.cost) best = { cx, cy, cost: cost < 0.5 ? 0 : cost };
+                            if (best.cost === 0) break;
                         }
+                        if (best && best.cost === 0) break;
                     }
-
-                    if (!collision) break;
-                    attempts++;
                 }
-
-                // Ensure label stays within bounds
-                const minY = LABEL_HEIGHT + 5;
-                const maxY = matrixHeight - 5;
-                const minX = labelWidth / 2 + 5;
-                const maxX = matrixWidth - labelWidth / 2 - 5;
-
-                labelXPx = Math.max(minX, Math.min(maxX, labelXPx));
-                labelYPx = Math.max(minY, Math.min(maxY, labelYPx));
-
-                // Check if we need a leader line
-                const distanceFromPoint = Math.abs(labelYPx - pointYPx);
-                if (distanceFromPoint > POINT_OFFSET + 5) {
-                    needsLeader = true;
-                }
-
-                labelPlacements.push({
-                    ...pos,
-                    labelXPx,
-                    labelYPx,
-                    labelWidth,
-                    needsLeader,
-                    pointXPx,
-                    pointYPx
-                });
+                if (!best) best = { cx: Math.max(minX, Math.min(maxX, pointXPx)), cy: Math.max(minY, Math.min(maxY, pointYPx - POINT_OFFSET)) };
+                labelPlacements.push({ ...pos, labelXPx: best.cx, labelYPx: best.cy, labelWidth, needsLeader: true, pointXPx, pointYPx });
             });
+            measurer.remove();
 
             // Render points and labels
             labelPlacements.forEach((pos) => {
@@ -1803,13 +1814,15 @@ const ocExport = (() => {
                     const leader = document.createElement('div');
                     leader.className = 'label-leader';
 
-                    const startY = Math.min(pos.pointYPx, pos.labelYPx);
-                    const endY = Math.max(pos.pointYPx, pos.labelYPx);
-                    const height = endY - startY - LABEL_HEIGHT / 2 - 8;
+                    // van de rand van het label tot de rand van de stip
+                    const above = pos.labelYPx < pos.pointYPx;
+                    const startY = above ? pos.labelYPx + LABEL_HEIGHT / 2 : pos.pointYPx + DOT_R;
+                    const endY = above ? pos.pointYPx - DOT_R : pos.labelYPx - LABEL_HEIGHT / 2;
+                    const height = endY - startY;
 
-                    if (height > 0) {
+                    if (height > 2) {
                         leader.style.left = pos.pointXPx + 'px';
-                        leader.style.top = (startY + (pos.labelYPx < pos.pointYPx ? LABEL_HEIGHT : 8)) + 'px';
+                        leader.style.top = startY + 'px';
                         leader.style.height = height + 'px';
                         leader.style.transform = 'translateX(-50%)';
                         container.appendChild(leader);
@@ -1844,6 +1857,8 @@ const ocExport = (() => {
             countEl.textContent = stakeholders.length > 0 ? `(${stakeholders.length})` : '';
             const pngBtn = document.getElementById('downloadPng');
             pngBtn.classList.toggle('btn-primary', stakeholders.length > 0); pngBtn.classList.toggle('btn-secondary', !stakeholders.length);
+            ['downloadPng', 'downloadPdf', 'downloadCsv'].forEach(id => { const b = document.getElementById(id); if (!b.dataset.label || b.innerHTML === b.dataset.label) b.disabled = !stakeholders.length; });
+            renderExample();
 
             if (stakeholders.length === 0) {
                 container.innerHTML = `
@@ -1865,7 +1880,7 @@ const ocExport = (() => {
                     <div class="stakeholder-item q-${s.todo ? 'todo' : q.class}">
                         <div class="stakeholder-info">
                             <div class="stakeholder-name">${esc(s.name)}</div>
-                            <div class="stakeholder-meta">${posSelect(i, 'contribution', s.contribution, 'Bijdrage', s.name)}<span aria-hidden="true">·</span>${posSelect(i, 'willingness', s.willingness, 'Bereidheid', s.name)}<span aria-hidden="true">·</span>${s.todo
+                            <div class="stakeholder-meta">${posSelect(i, 'contribution', s.contribution, 'Bijdrage', s.name)}${posSelect(i, 'willingness', s.willingness, 'Bereidheid', s.name)}${s.todo
                                 ? '<span class="sh-todo">nog in te schatten</span>'
                                 : `<span class="stakeholder-strategy q-${q.class}" title="${esc(q.tip)}">${q.name}</span>`}</div>
                             ${s.todo ? `<button type="button" class="sh-ok" data-ok="${i}">Klopt zo (5 en 5)</button>` : ''}
@@ -1952,6 +1967,7 @@ const ocExport = (() => {
 
         function reset() {
             stakeholders = [];
+            isExample = false;
             document.getElementById('projectName').value = ocProject('');
             document.getElementById('stakeholderName').value = '';
             document.getElementById('stakeholderNext').value = '';
@@ -1965,6 +1981,48 @@ const ocExport = (() => {
             document.getElementById('migrateNote').hidden = true;
             ocShare.clear('stakeholders');
             updateImportBtn();
+        }
+
+        /* ---------- Voorbeeld ---------- */
+        function renderExample() {
+            document.getElementById('vbStart').hidden = stakeholders.length > 0;
+            document.getElementById('vbBar').hidden = !isExample;
+        }
+        let projectBeforeExample = '';
+        function loadExample() {
+            if (stakeholders.length) return;
+            const S = (name, contribution, willingness, next) => ({ name, contribution, willingness, next });
+            projectBeforeExample = document.getElementById('projectName').value;
+            stakeholders = [
+                S('Afdelingshoofd', 9, 8, 'Wekelijks kort overleg over de planning'),
+                S('ICT-dienst', 8, 3, 'Gesprek over capaciteit en de koppeling met het oude systeem'),
+                S('Loketteam', 7, 4, 'Proefdraaien met drie collega’s van het loket'),
+                S('Juridische dienst', 6, 6, 'Privacytoets samen voorbereiden'),
+                S('Communicatie', 4, 9, 'Nieuwsbrief over de nieuwe aanvraagroute'),
+                S('Aanvragers', 3, 7, 'Korte bevraging na de eerste aanvragen'),
+                S('Vakbond', 3, 3, '')
+            ];
+            isExample = true;
+            document.getElementById('projectName').value = 'Digitaal premieloket';
+            renderMatrix(); renderStakeholderList();
+            ocToast('Voorbeeld geladen');
+        }
+        function clearExample() {
+            const before = { items: stakeholders, project: document.getElementById('projectName').value };
+            stakeholders = []; isExample = false;
+            document.getElementById('projectName').value = projectBeforeExample || ocProject('');
+            renderMatrix(); renderStakeholderList();
+            ocToast('Voorbeeld gewist', () => {
+                if (stakeholders.length) return;
+                stakeholders = before.items; isExample = true;
+                document.getElementById('projectName').value = before.project;
+                renderMatrix(); renderStakeholderList();
+            });
+        }
+        function keepExample() {
+            isExample = false;
+            renderStakeholderList();   // bewaart en deelt nu wel
+            ocToast('Het voorbeeld is nu van jou');
         }
 
         function downloadPng(e) { return ocDownload('png', e.currentTarget); }
@@ -2048,6 +2106,9 @@ const ocExport = (() => {
             document.getElementById('downloadPng').addEventListener('click', downloadPng);
             document.getElementById('downloadPdf').addEventListener('click', downloadPdf);
             document.getElementById('downloadCsv').addEventListener('click', downloadCsv);
+            document.getElementById('vbLoad').addEventListener('click', loadExample);
+            document.getElementById('vbWis').addEventListener('click', clearExample);
+            document.getElementById('vbEigen').addEventListener('click', keepExample);
 
             // Tooltips
             const tooltip = document.getElementById('tooltip');
