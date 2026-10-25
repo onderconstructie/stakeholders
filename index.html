@@ -1135,6 +1135,8 @@
     <div class="tooltip" id="tooltip" role="tooltip"></div>
 
     <script>
+/* Het actieve project uit de app (oc.project): nieuwe projecten, analyses en lijsten krijgen die naam. */
+function ocProject(fb) { try { const p = JSON.parse(localStorage.getItem('oc.project')); return p && typeof p.name === 'string' && p.name.trim() ? p.name.trim().slice(0, 80) : fb; } catch { return fb; } }
 /* ---------- Overnemen tussen tools (gedeeld door de Onder Constructie-tools, v2) ----------
    Alle tools draaien op hetzelfde domein en delen dus localStorage. Elke tool legt wat hij te bieden
    heeft klaar onder 'oc.share.<tool-id>', in een vaste vorm, zodat andere tools het kunnen overnemen
@@ -1287,8 +1289,8 @@ const ocShare = (() => {
    andere tools, zodat de app ze offline kan bewaren. */
 const ocExport = (() => {
   const LIBS = {
-    h2c: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-    pdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+    h2c: '/lib/html2canvas-1.4.1.min.js',
+    pdf: '/lib/jspdf-2.5.1.umd.min.js'
   };
   const A4 = { w: 210, h: 297 }, MARGIN = 10;   // mm
   const loaded = {};
@@ -1489,6 +1491,7 @@ const ocExport = (() => {
                     if (d.items.some(x => x && ('power' in x || 'interest' in x) && !('contribution' in x))) showMigrateNote();
                 }
             } catch (e) {}
+            if (!document.getElementById('projectName').value) document.getElementById('projectName').value = ocProject('');
             loaded = true;
         }
         /* Oude gegevens (macht/belang, schaal 0–10) omzetten: macht → bijdrage, belang → bereidheid, schaal 1–10. */
@@ -1949,7 +1952,7 @@ const ocExport = (() => {
 
         function reset() {
             stakeholders = [];
-            document.getElementById('projectName').value = '';
+            document.getElementById('projectName').value = ocProject('');
             document.getElementById('stakeholderName').value = '';
             document.getElementById('stakeholderNext').value = '';
             document.getElementById('powerSlider').value = 5;
