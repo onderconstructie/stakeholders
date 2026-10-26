@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff">
     <title>Stakeholder Radar – Onder Constructie</title>
-    <meta name="description" content="Breng in kaart wie kan bijdragen aan het succes en wie bereid is mee te gaan, en zie per stakeholder welke aanpak past.">
+    <meta name="description" content="Breng in kaart wie kan bijdragen aan het succes en wie wil meewerken, en zie per betrokkene welke aanpak past.">
     <meta name="oc:groep" content="projecten">
     <meta name="oc:labels" content="mensen">
     <meta name="oc:pdca" content="plan">
@@ -907,6 +907,21 @@
         }
         footer.oc-footer, footer.oc-footer .oc-quote, .footer .quote { color:#047857; }
         :focus-visible { outline:2px solid #047857 !important; outline-offset:2px; }
+        /* Wie spreek je eerst aan */
+        .first-box { margin:0 0 1rem; padding:0.75rem 0.875rem; border:1px solid #a7f3d0; background:#ecfdf5; border-radius:12px; color:#1e293b; }
+        .first-box h3 { font-size:0.8125rem; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.25rem; }
+        .first-box p { font-size:0.8125rem; color:#475569; margin:0 0 0.5rem; line-height:1.45; }
+        .first-box ol { list-style:none; margin:0; padding:0; display:grid; gap:0.375rem; }
+        .first-box li { display:grid; grid-template-columns:1.5rem minmax(0,1fr); gap:0.5rem; font-size:0.9375rem; align-items:baseline; }
+        .first-box li b { font-variant-numeric:tabular-nums; color:#047857; }
+        .first-box li span { min-width:0; overflow-wrap:anywhere; }
+        .first-box li small { display:block; font-size:0.8125rem; color:#475569; }
+        .field-err { font-size:0.8125rem; color:#b91c1c; font-weight:600; margin-top:0.375rem; min-height:0; }
+        .field-err:empty { display:none; }
+        #stakeholderName[aria-invalid="true"] { border-color:#dc2626; background:#fef2f2; }
+        .to-list { display:none; width:100%; min-height:44px; margin-top:0.5rem; border-radius:10px; border:1.5px solid #a7f3d0; background:#fff; color:#047857; font:inherit; font-size:0.9375rem; font-weight:600; cursor:pointer; }
+        @media (max-width:768px) { .to-list.has { display:block; } }
+        @media (max-width:360px) { .stakeholder-meta { flex-wrap:wrap; } .card { padding:1rem; } .matrix-wrapper { padding:1rem; } }
         input[type=range]:focus-visible { outline:2px solid #047857 !important; outline-offset:4px; }
         .oc-import { color:#047857; min-height:44px; }
         .oc-import:focus-visible { outline-color:#047857; }
@@ -1036,12 +1051,12 @@
             <input type="text" class="project-name-input" id="projectName" placeholder="Projectnaam invullen..." autocomplete="off" aria-label="Projectnaam">
         </div>
         <div class="migrate-note" id="migrateNote" role="status" hidden>
-            <span>Assen gewijzigd naar bijdrage en bereidheid: controleer de bereidheid van je stakeholders.</span>
+            <span>De assen zijn nu bijdrage en wil meewerken. Kijk na of het klopt voor je betrokkenen.</span>
             <button type="button" id="migrateOk">Begrepen</button>
         </div>
 
         <div class="vb-start" id="vbStart" hidden>
-            <span>Begin links met een eerste stakeholder, of verken eerst een ingevuld voorbeeld.</span>
+            <span>Voeg je eerste betrokkene toe, of bekijk eerst een ingevuld voorbeeld.</span>
             <button type="button" class="btn-s" id="vbLoad">Voorbeeld bekijken</button>
         </div>
         <div class="vb-bar" id="vbBar" role="note" hidden>
@@ -1052,11 +1067,12 @@
         <div class="main-grid">
             <!-- Left: Form -->
             <div class="card">
-                <h2 class="card-title">Stakeholder toevoegen</h2>
+                <h2 class="card-title">Betrokkene toevoegen</h2>
                 <div class="stakeholder-form">
                     <div class="form-group">
-                        <label for="stakeholderName">Naam stakeholder</label>
-                        <input type="text" id="stakeholderName" placeholder="Bijv. Projectsponsor, IT-afdeling..." autocomplete="off">
+                        <label for="stakeholderName">Naam</label>
+                        <input type="text" id="stakeholderName" placeholder="Bijv. Projectsponsor, IT-afdeling..." autocomplete="off" aria-describedby="nameErr">
+                        <p class="field-err" id="nameErr" aria-live="polite"></p>
                     </div>
                     
                     <div class="slider-group">
@@ -1073,10 +1089,10 @@
                     
                     <div class="slider-group">
                         <div class="slider-header">
-                            <label class="slider-label" id="interestLabel" for="interestSlider">Bereidheid</label>
+                            <label class="slider-label" id="interestLabel" for="interestSlider">Wil meewerken</label>
                             <span class="slider-value" id="interestValue">5</span>
                         </div>
-                        <input type="range" id="interestSlider" min="1" max="10" value="5" aria-label="Bereidheid, 1 tot 10">
+                        <input type="range" id="interestSlider" min="1" max="10" value="5" aria-label="Wil meewerken, 1 tot 10">
                         <div class="slider-hints">
                             <span>tegen</span>
                             <span>enthousiast</span>
@@ -1097,6 +1113,7 @@
                         Overnemen uit…
                     </button>
                     <p class="import-note" id="importNote" role="status" hidden></p>
+                    <button type="button" class="to-list" id="toList">Naar het overzicht</button>
                 </div>
 
                 <div class="legend-section">
@@ -1127,7 +1144,7 @@
                             <div id="pointsContainer"></div>
                         </div>
                     </div>
-                    <div class="axis-label axis-label-x" id="axisLabelX" tabindex="0" role="button" aria-label="Bereidheid: uitleg">Bereidheid →</div>
+                    <div class="axis-label axis-label-x" id="axisLabelX" tabindex="0" role="button" aria-label="Wil meewerken: uitleg">Wil meewerken →</div>
                     <div class="axis-label axis-label-y" id="axisLabelY" tabindex="0" role="button" aria-label="Bijdrage: uitleg">↑ Bijdrage</div>
                 </div>
                 <div class="todo-strip" id="todoStrip" hidden></div>
@@ -1135,15 +1152,16 @@
 
             <!-- Right: List -->
             <div class="card list-card">
-                <h2 class="card-title">Overzicht <span id="stakeholderCount"></span></h2>
+                <h2 class="card-title" id="overzicht" tabindex="-1">Overzicht <span id="stakeholderCount"></span></h2>
+                <div class="first-box" id="firstBox" hidden></div>
                 <div class="stakeholder-list" id="stakeholderList">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <circle cx="12" cy="8" r="4"/>
                             <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
                         </svg>
-                        <div>Nog geen stakeholders</div>
-                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Voeg links een stakeholder toe</div>
+                        <div>Nog geen betrokkenen</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Voeg eerst een betrokkene toe</div>
                     </div>
                 </div>
 
@@ -1494,10 +1512,15 @@ const ocExport = (() => {
 
         function EXPORT_LIST() {
             const groups = [QUADS.manage, QUADS.anticipate, QUADS.inform, QUADS.monitor];
-            return groups.map(g => ocGroupHTML(g.color, g.text, g.name, g.sub,
+            const first = firstOrder().slice(0, 3);
+            return (first.length ? `<div data-oc-keep style="margin-bottom:18px;padding:10px 12px;border:1px solid #a7f3d0;background:#ecfdf5;border-radius:10px">
+                <div style="font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#065f46">Wie spreek je eerst aan</div>
+                <div style="font-size:12px;color:#475569;margin:2px 0 6px">Wie veel kan bijdragen maar (nog) weinig wil meewerken, staat bovenaan.</div>
+                ${first.map((s, k) => `<div style="font-size:14px;color:#1e293b;padding:2px 0"><b style="color:#047857">${k + 1}.</b> ${ocEsc(s.name)}${s.next ? ` <span style="color:#64748b">→ ${ocEsc(s.next)}</span>` : ''}</div>`).join('')}</div>` : '')
+                + groups.map(g => ocGroupHTML(g.color, g.text, g.name, g.sub,
                 stakeholders.filter(s => !s.todo && qOf(s) === g)
                      .sort((a, b) => (b.contribution + b.willingness) - (a.contribution + a.willingness))
-                     .map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, meta: `bijdrage ${s.contribution} · bereidheid ${s.willingness}` })))).join('')
+                     .map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, meta: `bijdrage ${s.contribution} · wil meewerken ${s.willingness}` })))).join('')
                 + ocGroupHTML('#94a3b8', '#475569', 'Nog in te schatten', 'positie nog niet bepaald',
                     stakeholders.filter(s => s.todo).map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, meta: 'nog niet in de radar' })))
                 + `<div data-oc-keep style="margin-top:6px;font-size:11px;line-height:1.5;color:#64748b">${groups.map(g =>
@@ -1566,7 +1589,7 @@ const ocExport = (() => {
         }
         async function importStakeholders() {
             const picked = await ocShare.pick({ types: ['betrokkene'], self: 'stakeholders', title: 'Betrokkenen overnemen',
-                intro: 'Kies wie je in de radar wil zetten. Ze staan eerst apart als ‘nog in te schatten’ en tellen pas mee zodra je hun bijdrage en bereidheid instelt.' });
+                intro: 'Kies wie je in de radar wil zetten. Ze staan eerst apart als ‘nog in te schatten’ en tellen pas mee zodra je hun bijdrage en hoe graag ze meewerken instelt.' });
             if (!picked.length) return;
             const have = new Set(stakeholders.map(x => x.name.trim().toLowerCase()));
             let n = 0;
@@ -1581,7 +1604,7 @@ const ocExport = (() => {
             const note = document.getElementById('importNote');
             const skipped = picked.length - n;
             note.textContent = n
-                ? `${n} overgenomen als ‘nog in te schatten’: stel in het overzicht hun bijdrage en bereidheid in${skipped ? ` (${skipped} stond${skipped === 1 ? '' : 'en'} er al)` : ''}.`
+                ? `${n} overgenomen als ‘nog in te schatten’: stel in het overzicht hun bijdrage en ‘wil meewerken’ in${skipped ? ` (${skipped} stond${skipped === 1 ? '' : 'en'} er al)` : ''}.`
                 : 'Die stonden er allemaal al.';
             note.hidden = false;
             clearTimeout(note._t); note._t = setTimeout(() => { note.hidden = true; }, 6000);
@@ -1654,13 +1677,13 @@ const ocExport = (() => {
            Bijdrage: in hoeverre iemand het resultaat mee kan maken of breken (verticaal).
            Bereidheid: in hoeverre iemand de verandering wil steunen (horizontaal). */
         const QUADS = {
-            manage:     { name: 'Nauw betrekken', class: 'manage',  color: '#047857', text: '#065f46', sub: 'veel bijdrage, hoge bereidheid',
+            manage:     { name: 'Nauw betrekken', class: 'manage',  color: '#047857', text: '#065f46', sub: 'veel bijdrage, wil meewerken',
                           tip: 'Sleutelfiguren en beslissers. Werk nauw en geregeld met hen samen, laat ze meebeslissen, stem verwachtingen af en houd hun steun in het oog.' },
-            anticipate: { name: 'Vroeg opzoeken', class: 'anticipate', color: '#f97316', text: '#c2410c', sub: 'veel bijdrage, lage bereidheid',
+            anticipate: { name: 'Vroeg opzoeken', class: 'anticipate', color: '#f97316', text: '#c2410c', sub: 'veel bijdrage, wil (nog) niet mee',
                           tip: 'Invloedrijk, maar (nog) niet mee, en hun belangen kunnen botsen met het project. Zoek ze vroeg zelf op, leer hun bezwaren kennen en betrek ze bij grote keuzes: wie je meekrijgt, kan een pleitbezorger worden.' },
-            inform:     { name: 'Op de hoogte houden', class: 'inform', color: '#10b981', text: '#047857', sub: 'weinig bijdrage, hoge bereidheid',
+            inform:     { name: 'Op de hoogte houden', class: 'inform', color: '#10b981', text: '#047857', sub: 'weinig bijdrage, wil meewerken',
                           tip: 'Welwillend, met beperkte invloed. Houd ze geregeld op de hoogte en vraag hun mening; ze brengen vaak goede ideeën aan. Zorg dat niets hen overvalt.' },
-            monitor:    { name: 'In het oog houden', class: 'monitor',    color: '#94a3b8', text: '#64748b', sub: 'weinig bijdrage, lage bereidheid',
+            monitor:    { name: 'In het oog houden', class: 'monitor',    color: '#94a3b8', text: '#64748b', sub: 'weinig bijdrage, wil (nog) niet mee',
                           tip: 'Weinig invloed en weinig betrokken. Algemene communicatie volstaat, maar volg of hun positie verschuift.' }
         };
         const HIGH = v => v >= 6;
@@ -1796,7 +1819,7 @@ const ocExport = (() => {
 
                 const dot = document.createElement('div');
                 dot.className = `point-dot q-${pos.quadrant.class}`;
-                dot.title = `${pos.name}\nBijdrage: ${pos.contribution}, Bereidheid: ${pos.willingness}\n→ ${pos.quadrant.name}${pos.next ? '\nVolgende stap: ' + pos.next : ''}`;
+                dot.title = `${pos.name}\nBijdrage: ${pos.contribution}, Wil meewerken: ${pos.willingness}\n→ ${pos.quadrant.name}${pos.next ? '\nVolgende stap: ' + pos.next : ''}`;
                 point.appendChild(dot);
 
                 // Add stack badge if multiple at same position
@@ -1845,12 +1868,24 @@ const ocExport = (() => {
             if (!strip) return;
             const todo = stakeholders.filter(x => x.todo);
             strip.hidden = !todo.length;
-            strip.innerHTML = todo.length ? `<b>Nog in te schatten (${todo.length})</b>: nog niet in de radar en niet meegeteld. Stel hun bijdrage en bereidheid in bij het overzicht.<br>${todo.map(x => `<span class="chip">${esc(x.name)}</span>`).join('')}` : '';
+            strip.innerHTML = todo.length ? `<b>Nog in te schatten (${todo.length})</b>: nog niet in de radar en niet meegeteld. Stel hun bijdrage en ‘wil meewerken’ in bij het overzicht.<br>${todo.map(x => `<span class="chip">${esc(x.name)}</span>`).join('')}` : '';
         }
         const posSelect = (i, key, v, label, name) => `<label class="sh-pos">${label} <select data-pos="${key}" data-i="${i}" aria-label="${label} van ${esc(name)}">${
             Array.from({ length: 10 }, (_, k) => `<option value="${k + 1}"${k + 1 === v ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></label>`;
+        /* Wie spreek je eerst aan: veel bijdrage × weinig zin om mee te werken. Wie nog in te schatten is, telt niet mee. */
+        const urgency = s => s.contribution * (11 - s.willingness);
+        const firstOrder = () => stakeholders.filter(s => !s.todo).slice().sort((a, b) => urgency(b) - urgency(a) || b.contribution - a.contribution);
+        function renderFirstBox() {
+            const box = document.getElementById('firstBox'), top = firstOrder().slice(0, 3);
+            box.hidden = !top.length;
+            document.getElementById('toList').classList.toggle('has', stakeholders.length > 0);
+            if (!top.length) { box.innerHTML = ''; return; }
+            box.innerHTML = `<h3>Wie spreek je eerst aan</h3><p>Wie veel kan bijdragen maar (nog) weinig wil meewerken, staat bovenaan.</p>
+                <ol>${top.map((s, k) => `<li><b>${k + 1}.</b><span>${esc(s.name)}<small>${qOf(s).name}${s.next ? ' · ' + esc(s.next) : ''}</small></span></li>`).join('')}</ol>`;
+        }
         function renderStakeholderList() {
             saveState();
+            renderFirstBox();
             const container = document.getElementById('stakeholderList');
             const countEl = document.getElementById('stakeholderCount');
 
@@ -1867,8 +1902,8 @@ const ocExport = (() => {
                             <circle cx="12" cy="8" r="4"/>
                             <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
                         </svg>
-                        <div>Nog geen stakeholders</div>
-                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Voeg links een stakeholder toe</div>
+                        <div>Nog geen betrokkenen</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Voeg eerst een betrokkene toe</div>
                     </div>
                 `;
                 return;
@@ -1880,7 +1915,7 @@ const ocExport = (() => {
                     <div class="stakeholder-item q-${s.todo ? 'todo' : q.class}">
                         <div class="stakeholder-info">
                             <div class="stakeholder-name">${esc(s.name)}</div>
-                            <div class="stakeholder-meta">${posSelect(i, 'contribution', s.contribution, 'Bijdrage', s.name)}${posSelect(i, 'willingness', s.willingness, 'Bereidheid', s.name)}${s.todo
+                            <div class="stakeholder-meta">${posSelect(i, 'contribution', s.contribution, 'Bijdrage', s.name)}${posSelect(i, 'willingness', s.willingness, 'Wil meewerken', s.name)}${s.todo
                                 ? '<span class="sh-todo">nog in te schatten</span>'
                                 : `<span class="stakeholder-strategy q-${q.class}" title="${esc(q.tip)}">${q.name}</span>`}</div>
                             ${s.todo ? `<button type="button" class="sh-ok" data-ok="${i}">Klopt zo (5 en 5)</button>` : ''}
@@ -1900,11 +1935,12 @@ const ocExport = (() => {
             const name = nameInput.value.trim();
 
             if (!name) {
+                nameInput.setAttribute('aria-invalid', 'true');
+                document.getElementById('nameErr').textContent = 'Typ eerst een naam.';
                 nameInput.focus();
-                nameInput.style.borderColor = '#f97316';
-                setTimeout(() => nameInput.style.borderColor = '', 1000);
                 return;
             }
+            nameInput.removeAttribute('aria-invalid'); document.getElementById('nameErr').textContent = '';
 
             const contribution = clamp10(document.getElementById('powerSlider').value);
             const willingness = clamp10(document.getElementById('interestSlider').value);
@@ -2033,7 +2069,7 @@ const ocExport = (() => {
             const name = document.getElementById('projectName').value || 'Stakeholder Radar';
 
             const cell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
-            let csv = 'Stakeholder;Bijdrage aan succes;Bereidheid;Aanpak;Volgende stap\n';
+            let csv = 'Betrokkene;Bijdrage aan succes;Wil meewerken;Aanpak;Volgende stap\n';
             stakeholders.forEach(s => {
                 const q = qOf(s);
                 csv += [cell(s.name), s.contribution, s.willingness, cell(s.todo ? 'Nog in te schatten' : q.name), cell(s.next || '')].join(';') + '\n';
@@ -2093,6 +2129,8 @@ const ocExport = (() => {
             });
 
             document.getElementById('addStakeholder').addEventListener('click', addStakeholder);
+            document.getElementById('stakeholderName').addEventListener('input', e => { if (e.target.getAttribute('aria-invalid')) { e.target.removeAttribute('aria-invalid'); document.getElementById('nameErr').textContent = ''; } });
+            document.getElementById('toList').addEventListener('click', () => { const h = document.getElementById('overzicht'); h.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); h.focus({ preventScroll: true }); });
 
             document.getElementById('stakeholderName').addEventListener('keypress', e => {
                 if (e.key === 'Enter') addStakeholder();
@@ -2128,30 +2166,30 @@ const ocExport = (() => {
             }
 
             document.getElementById('axisLabelX').addEventListener('mouseenter', e => {
-                showTooltip(e.target, 'Bereidheid: in hoeverre wil deze stakeholder de verandering steunen? Van tegen (links) tot enthousiast (rechts).');
+                showTooltip(e.target, 'Wil meewerken: hoe graag steunt deze betrokkene de verandering? Op de radar van tegen (links) tot enthousiast (rechts).');
             });
             document.getElementById('axisLabelX').addEventListener('mouseleave', hideTooltip);
 
             document.getElementById('axisLabelY').addEventListener('mouseenter', e => {
-                showTooltip(e.target, 'Bijdrage aan succes: in hoeverre kan deze stakeholder het resultaat mee maken of breken? Boven = meer.');
+                showTooltip(e.target, 'Bijdrage aan succes: kan deze betrokkene het resultaat mee maken of breken? Boven = meer.');
             });
             document.getElementById('axisLabelY').addEventListener('mouseleave', hideTooltip);
 
             document.getElementById('powerLabel').addEventListener('mouseenter', e => {
-                showTooltip(e.target, 'Bijdrage aan succes: in hoeverre kan deze stakeholder het resultaat mee maken of breken? Denk aan beslissingsmacht, middelen, kennis of sleutelposities.');
+                showTooltip(e.target, 'Bijdrage aan succes: kan deze betrokkene het resultaat mee maken of breken? Denk aan wie beslist, geld of mensen heeft, of veel weet.');
             });
             document.getElementById('powerLabel').addEventListener('mouseleave', hideTooltip);
 
             document.getElementById('interestLabel').addEventListener('mouseenter', e => {
-                showTooltip(e.target, 'Bereidheid: in hoeverre wil deze stakeholder de verandering steunen? Laag = tegen of afwachtend, hoog = enthousiast.');
+                showTooltip(e.target, 'Wil meewerken: hoe graag steunt deze betrokkene de verandering? Laag = tegen of afwachtend, hoog = enthousiast.');
             });
             document.getElementById('interestLabel').addEventListener('mouseleave', hideTooltip);
 
             // Uitleg ook bij toetsenbordfocus en tikken (niet enkel bij muis)
-            [['axisLabelX', 'Bereidheid: in hoeverre wil deze stakeholder de verandering steunen? Van tegen (links) tot enthousiast (rechts).'],
-             ['axisLabelY', 'Bijdrage aan succes: in hoeverre kan deze stakeholder het resultaat mee maken of breken? Boven = meer.'],
-             ['powerLabel', 'Bijdrage aan succes: in hoeverre kan deze stakeholder het resultaat mee maken of breken? Denk aan beslissingsmacht, middelen, kennis of sleutelposities.'],
-             ['interestLabel', 'Bereidheid: in hoeverre wil deze stakeholder de verandering steunen? Laag = tegen of afwachtend, hoog = enthousiast.']].forEach(([id, text]) => {
+            [['axisLabelX', 'Wil meewerken: hoe graag steunt deze betrokkene de verandering? Op de radar van tegen (links) tot enthousiast (rechts).'],
+             ['axisLabelY', 'Bijdrage aan succes: kan deze betrokkene het resultaat mee maken of breken? Boven = meer.'],
+             ['powerLabel', 'Bijdrage aan succes: kan deze betrokkene het resultaat mee maken of breken? Denk aan wie beslist, geld of mensen heeft, of veel weet.'],
+             ['interestLabel', 'Wil meewerken: hoe graag steunt deze betrokkene de verandering? Laag = tegen of afwachtend, hoog = enthousiast.']].forEach(([id, text]) => {
                 const el = document.getElementById(id);
                 el.addEventListener('focus', () => showTooltip(el, text));
                 el.addEventListener('blur', hideTooltip);
