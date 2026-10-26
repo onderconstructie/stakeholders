@@ -1031,7 +1031,18 @@
         .restart-btn { min-height: 44px; padding: 0.5rem 1rem; font: inherit; font-size: 0.875rem; font-weight: 500; color: #64748b; background: none; border: 0; border-radius: 10px; cursor: pointer; text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 3px; }
         .restart-btn:hover { color: #b91c1c; background: #fef2f2; text-decoration-color: currentColor; }
         @media (min-width:769px) { .oc-toast { left:auto; right:1.25rem; max-width:360px; transform:translateY(calc(100% + 3rem)); } .oc-toast.show { transform:none; } }
-    </style>
+    /* ---------- Soepel op gsm: tikken zonder vertraging, zichtbare druk, geen inzoomen, vensters die de pagina niet meeslepen ---------- */
+button, a, summary, label, select, input, textarea, [role="button"], [role="tab"], [role="radio"] { touch-action:manipulation; }
+button, a, summary, label, [role="button"], [role="tab"], [role="radio"] { -webkit-tap-highlight-color:transparent; }
+button:not(:disabled):active, a:active, summary:active, [role="button"]:active { filter:brightness(0.93); }
+@supports (min-height:100dvh) { body { min-height:100dvh; } }
+.ocs, .ocs-body, .ocw, .menu { overscroll-behavior:contain; }
+body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
+@media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; } }
+@media (pointer:coarse), (max-width:760px) { .form-group input[type="text"], .stakeholder-next, .sh-pos select { font-size:16px; } }
+.ocs-back .ocs { max-height:min(86dvh, 720px); }
+@supports (height:100svh) { .matrix-container { max-width:max(320px, calc(100svh - 260px)); } }
+</style>
 </head>
 <body>
     <header class="header oc-head">
@@ -1048,7 +1059,7 @@
 
     <div class="container">
         <div class="project-bar">
-            <input type="text" class="project-name-input" id="projectName" placeholder="Projectnaam invullen..." autocomplete="off" aria-label="Projectnaam">
+            <input type="text" class="project-name-input" id="projectName" placeholder="Projectnaam invullen..." autocomplete="off" enterkeyhint="done" aria-label="Projectnaam">
         </div>
         <div class="migrate-note" id="migrateNote" role="status" hidden>
             <span>De assen zijn nu bijdrage en wil meewerken. Kijk na of het klopt voor je betrokkenen.</span>
@@ -1064,6 +1075,7 @@
             <div class="vb-btns"><button type="button" class="vb-btn vb-wis" id="vbWis">Wis voorbeeld</button><button type="button" class="vb-btn vb-eigen" id="vbEigen">Maak er mijn eigen van</button></div>
         </div>
 
+        <script>try { var sh0 = JSON.parse(localStorage.getItem('stakeholders.v1') || 'null'), sh1 = !!(sh0 && Array.isArray(sh0.items) && sh0.items.some(function (x) { return x && x.name; })); document.getElementById('vbStart').hidden = sh1; document.getElementById('vbBar').hidden = !(sh1 && sh0.voorbeeld === true); } catch (e) {}</script>
         <div class="main-grid">
             <!-- Left: Form -->
             <div class="card">
@@ -2200,7 +2212,11 @@ const ocExport = (() => {
 
             // Re-render on window resize
             let resizeTimeout;
+            // Op gsm verandert de hoogte bij elk scrollen (adresbalk): enkel bij een andere breedte hertekenen.
+            let lastW = innerWidth, lastH = innerHeight;
             window.addEventListener('resize', () => {
+                if (innerWidth === lastW && (matchMedia('(pointer:coarse)').matches || innerHeight === lastH)) return;
+                lastW = innerWidth; lastH = innerHeight;
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
                     renderMatrix();
