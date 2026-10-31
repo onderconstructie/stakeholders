@@ -1028,6 +1028,7 @@
         .oc-toast button { font: inherit; font-weight: 600; color: #6ee7b7; background: transparent; border: 0; min-height: 44px; padding: 0 0.75rem; border-radius: 8px; cursor: pointer; white-space: nowrap; }
         .oc-toast button:hover { background: rgba(255,255,255,0.08); }
         .restart-row { display: flex; justify-content: center; margin-top: 1.25rem; }
+        .restart-row[hidden] { display: none; }
         .restart-btn { min-height: 44px; padding: 0.5rem 1rem; font: inherit; font-size: 0.875rem; font-weight: 500; color: #64748b; background: none; border: 0; border-radius: 10px; cursor: pointer; text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 3px; }
         .restart-btn:hover { color: #b91c1c; background: #fef2f2; text-decoration-color: currentColor; }
         @media (min-width:769px) { .oc-toast { left:auto; right:1.25rem; max-width:360px; transform:translateY(calc(100% + 3rem)); } .oc-toast.show { transform:none; } }
@@ -1210,14 +1211,10 @@ body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
                         </button>
                     </div>
                     <p class="ocb-note">Een afbeelding, PDF of CSV kan je niet terug openen.</p>
-                    <button class="btn btn-outline" id="resetBtn" style="width: 100%;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        Alles wissen
-                    </button>
                 </div>
             </div>
         </div>
-        <div class="restart-row"><button type="button" class="restart-btn" id="ocRestart" title="Alles wissen en opnieuw beginnen">Opnieuw beginnen</button></div>
+        <div class="restart-row" id="restartRow" hidden><button type="button" class="restart-btn" id="ocRestart" title="Alles wissen en opnieuw beginnen">Opnieuw beginnen</button></div>
     </div>
 
     <footer class="footer oc-footer">
@@ -1469,7 +1466,7 @@ const ocExport = (() => {
   return { png, pdf };
 })();
 
-        const FILE_PREFIX = 'stakeholders', EXPORT_TITLE = 'Stakeholder Radar', ITEM_ONE = "stakeholder", ITEM_MANY = "stakeholders";
+        const FILE_PREFIX = 'stakeholders', EXPORT_TITLE = 'Stakeholder Radar', ITEM_ONE = "betrokkene", ITEM_MANY = "betrokkenen";
         const ITEMS = () => stakeholders;
         /* ---------- Downloads in de gedeelde Onder Constructie-layout ---------- */
         const ocEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
@@ -1511,7 +1508,7 @@ const ocExport = (() => {
                                       : ocExport.pdf(buildExport, ocFileName(FILE_PREFIX), { landscape:true }));
                 ocFlash(btn, kind === 'png' ? 'Afbeelding gedownload' : 'PDF gedownload');
             } catch (e) {
-                ocFlash(btn, 'Downloaden lukt nu niet: geen verbinding?', 3500);
+                ocFlash(btn, 'Downloaden lukt nu niet. Probeer opnieuw.', 3500);
             }
         }
         function buildExport() {
@@ -1969,6 +1966,12 @@ const ocExport = (() => {
                 nameInput.focus();
                 return;
             }
+            if (stakeholders.some(x => x.name.trim().toLowerCase() === name.toLowerCase())) {
+                nameInput.setAttribute('aria-invalid', 'true');
+                document.getElementById('nameErr').textContent = `${name.slice(0, 80)} staat al in het overzicht. Pas daar de inschatting aan, of kies een andere naam.`;
+                nameInput.focus();
+                return;
+            }
             nameInput.removeAttribute('aria-invalid'); document.getElementById('nameErr').textContent = '';
 
             const contribution = clamp10(document.getElementById('powerSlider').value);
@@ -2052,6 +2055,8 @@ const ocExport = (() => {
         function renderExample() {
             document.getElementById('vbStart').hidden = stakeholders.length > 0;
             document.getElementById('vbBar').hidden = !isExample;
+            // Eén plek om te wissen: "Opnieuw beginnen", zodra er iemand op de radar staat.
+            document.getElementById('restartRow').hidden = stakeholders.length === 0;
         }
         let projectBeforeExample = '';
         function loadExample() {
@@ -2095,8 +2100,6 @@ const ocExport = (() => {
         function downloadPdf(e) { return ocDownload('pdf', e.currentTarget); }
 
         function downloadCsv() {
-            const name = document.getElementById('projectName').value || 'Stakeholder Radar';
-
             const cell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
             let csv = 'Betrokkene;Bijdrage aan succes;Wil meewerken;Aanpak;Volgende stap\n';
             stakeholders.forEach(s => {
@@ -2107,7 +2110,7 @@ const ocExport = (() => {
             const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${name.toLowerCase().replace(/\s+/g, '-')}-stakeholders.csv`;
+            link.download = ocFileName(FILE_PREFIX) + '.csv';
             link.click();
         }
 
@@ -2132,7 +2135,7 @@ const ocExport = (() => {
                 const i = e.target && e.target.dataset ? e.target.dataset.next : undefined;
                 if (i === undefined || !stakeholders[+i]) return;
                 stakeholders[+i].next = e.target.value.trim().slice(0, 140);
-                saveState(); renderMatrix();
+                saveState(); renderMatrix(); renderFirstBox();
             });
             document.getElementById('stakeholderList').addEventListener('click', e => {
                 const del = e.target.closest('[data-del]');
@@ -2168,7 +2171,6 @@ const ocExport = (() => {
                 if (e.key === 'Enter') addStakeholder();
             });
 
-            document.getElementById('resetBtn').addEventListener('click', wipeAll);
             document.getElementById('ocRestart').addEventListener('click', wipeAll);
             document.getElementById('downloadPng').addEventListener('click', downloadPng);
             document.getElementById('downloadPdf').addEventListener('click', downloadPdf);
