@@ -1064,6 +1064,56 @@ body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
 .download-row .btn, .download-row .btn-secondary { background:var(--wit,#fff); border:1.5px solid #e2e8f0; color:#047857; font-weight:600; }
 .download-row .btn:hover:not(:disabled) { background:#ecfdf5; border-color:#a7f3d0; }
 .download-row .btn svg { display:none; }
+
+/* ---------- Eenheid (november 2026): één kop, één ⋮-menu, één startscherm en één melding, zoals in de referentietools ---------- */
+.oc-head { padding:1.5rem 1.25rem 1.75rem; }
+.oc-head .back-link { top:1.25rem; left:1.25rem; padding:0; margin:0; min-height:44px; min-width:44px; gap:0.5rem; font-size:0.875rem; color:#64748b; }
+.oc-head .back-link:hover { color:#047857; }
+.oc-head .logo, .oc-head .oc-logo, .oc-head .logo svg, .oc-head .oc-logo svg { display:block; width:56px; height:56px; margin:0 auto; }
+.oc-head .title { font-size:1.625rem; font-weight:700; color:#1e293b; letter-spacing:-0.03em; line-height:1.2; margin:0.5rem 0 0; }
+.oc-head .subtitle { font-size:0.9375rem; color:#64748b; max-width:34rem; margin:0.125rem auto 0; }
+@media (max-width:640px) {
+  .oc-head { padding:1.5rem 1.25rem 1.75rem; }
+  .oc-head .back-link { position:static; display:flex; justify-content:center; margin:0 auto 0.75rem; width:max-content; }
+  .oc-head .back-link span { display:inline; }
+}
+.ocm-wrap { position:relative; flex-shrink:0; }
+.ocm-btn { width:44px; height:44px; min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:10px; background:none; color:#64748b; cursor:pointer; flex-shrink:0; }
+.ocm-btn:hover, .ocm-btn[aria-expanded="true"] { background:#f1f5f9; color:#334155; }
+.ocm-btn svg { width:20px; height:20px; }
+.ocm { display:none; position:absolute; right:0; top:calc(100% + 4px); z-index:150; min-width:230px; max-width:calc(100vw - 2rem); background:#fff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 12px 32px rgba(15,23,42,0.14); padding:0.375rem; text-align:left; overscroll-behavior:contain; }
+.ocm.open { display:block; }
+.ocm button { width:100%; display:flex; align-items:center; gap:0.625rem; min-height:44px; margin:0; padding:0.5625rem 0.625rem; border:0; border-radius:8px; background:none; font:inherit; font-size:0.9375rem; font-weight:400; line-height:1.4; text-align:left; color:#334155; white-space:nowrap; cursor:pointer; }
+.ocm button:hover { background:#f1f5f9; }
+.ocm button[hidden] { display:none; }
+.ocm button svg { width:18px; height:18px; color:#64748b; flex-shrink:0; }
+.ocm .sep { height:1px; background:#f1f5f9; margin:0.25rem 0.375rem; }
+.ocm .danger, .ocm .danger svg { color:#ef4444; }
+.ocm .ocm-t { display:flex; flex-direction:column; min-width:0; white-space:normal; line-height:1.3; }
+.ocm .ocm-t small { font-size:0.8125rem; color:#64748b; margin-top:0.125rem; }
+.ocm .ocm-note { margin:0; padding:0.25rem 0.625rem 0.375rem; font-size:0.8125rem; line-height:1.35; color:#64748b; white-space:normal; text-align:left; }
+.oc-start { background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 1px 2px rgba(15,23,42,0.04); padding:1.5rem 1.25rem; text-align:center; }
+.oc-start[hidden] { display:none !important; }
+.oc-start > p:first-child { color:#475569; font-size:0.9375rem; line-height:1.5; margin:0 0 0.875rem; }
+.oc-start-btns { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+.oc-btn { min-height:44px; padding:0.5rem 1rem; border:0; border-radius:10px; font:inherit; font-size:0.9375rem; font-weight:600; cursor:pointer; }
+.oc-btn-primary { background:#047857; color:#fff; }
+.oc-btn-primary:hover { background:#065f46; }
+.oc-btn-ghost { background:#f1f5f9; color:#334155; }
+.oc-btn-ghost:hover { background:#e2e8f0; }
+.oc-open-row { display:flex; justify-content:center; margin:0.5rem 0 0; }
+.oc-open-link { display:inline-flex; align-items:center; gap:0.5rem; min-height:44px; padding:0.5rem 1rem; border:0; border-radius:10px; background:none; font:inherit; font-size:0.875rem; font-weight:600; color:#047857; cursor:pointer; }
+.oc-open-link:hover { background:#ecfdf5; }
+.oc-open-link svg, .oc-open-row .oc-open-link svg { width:18px; height:18px; margin:0; color:currentColor; opacity:1; flex:none; }
+
+/* melding: donker, onderaan in het midden, ook op een breed scherm */
+.oc-toast { left:50%; right:auto; bottom:calc(1.25rem + env(safe-area-inset-bottom, 0px)); max-width:calc(100% - 2rem); font-size:0.875rem; transform:translate(-50%, calc(100% + 3rem)); }
+.oc-toast.show { transform:translate(-50%, 0); }
+
+.oc-bar { display:flex; align-items:center; justify-content:center; gap:0.5rem; max-width:452px; margin:0 auto 1.5rem; }
+.oc-bar .project-name-input { flex:1 1 auto; min-width:0; max-width:none; }
+#vbStart { max-width:720px; margin:0 auto 1.25rem; }
+
 </style>
 </head>
 <body>
@@ -1080,18 +1130,16 @@ body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
     </header>
 
     <div class="container">
-        <div class="project-bar">
+        <div class="project-bar oc-bar">
             <input type="text" class="project-name-input" id="projectName" placeholder="Projectnaam invullen..." autocomplete="off" enterkeyhint="done" aria-label="Projectnaam">
+            <div class="ocm-wrap"><button type="button" class="ocm-btn" id="ocMenuBtn" aria-label="Meer acties" aria-haspopup="true" aria-expanded="false" aria-controls="ocMenu"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button><div class="ocm" id="ocMenu" role="menu" aria-label="Meer acties"><button type="button" data-ocb="bewaar" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 11v6M9 14l3 3 3-3"/></svg><span class="ocm-t">Bewaar als bestand<small>Om later verder te werken, of door te geven</small></span></button><button type="button" data-ocb="open" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13l3-3 3 3"/></svg>Open bestand</button><div class="sep" role="separator"></div><button type="button" data-ocm="pdf" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15h6M9 18h4"/></svg>Download als PDF</button><button type="button" data-ocm="png" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Download als afbeelding</button><button type="button" data-ocm="csv" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h8M12 13v4"/></svg>Download als CSV</button><p class="ocm-note">Een afbeelding, PDF of CSV kan je niet terug openen.</p><div class="sep" role="separator"></div><button type="button" data-ocm="wipe" class="danger" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>Alles wissen</button></div></div>
         </div>
         <div class="migrate-note" id="migrateNote" role="status" hidden>
             <span>De assen zijn nu bijdrage en wil meewerken. Kijk na of het klopt voor je betrokkenen.</span>
             <button type="button" id="migrateOk">Begrepen</button>
         </div>
 
-        <div class="vb-start" id="vbStart" hidden>
-            <span>Voeg je eerste betrokkene toe, of bekijk eerst een ingevuld voorbeeld.</span>
-            <button type="button" class="btn-s" id="vbLoad">Voorbeeld bekijken</button>
-        </div>
+        <div class="oc-start" id="vbStart" hidden><p>Nog niemand op de radar. Begin met je eerste betrokkene, of bekijk eerst een ingevuld voorbeeld.</p><div class="oc-start-btns"><button type="button" class="oc-btn oc-btn-primary" id="ocBegin">Begin met een betrokkene</button><button type="button" class="oc-btn oc-btn-ghost" id="vbLoad">Voorbeeld bekijken</button></div><p class="oc-open-row"><button type="button" class="oc-open-link" data-ocb="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 16v-5M9.5 13.5 12 11l2.5 2.5"/></svg>Open bestand</button></p></div>
         <div class="vb-bar" id="vbBar" role="note" hidden>
             <div class="vb-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Dit is een voorbeeld om de tool te verkennen. Het telt niet mee in andere tools.</span></div>
             <div class="vb-btns"><button type="button" class="vb-btn vb-wis" id="vbWis">Wis voorbeeld</button><button type="button" class="vb-btn vb-eigen" id="vbEigen">Maak er mijn eigen van</button></div>
@@ -1199,28 +1247,6 @@ body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
                     </div>
                 </div>
 
-                <div class="actions-section">
-                    <div class="ocb"><button type="button" class="ocb-item" data-ocb="bewaar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 11v7M9 15l3 3 3-3"/></svg><span class="ocb-txt"><span class="ocb-t">Bewaar als bestand</span><span class="ocb-s">Om later verder te werken, of door te geven</span></span></button><button type="button" class="ocb-item" data-ocb="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 17v-6M9 14l3-3 3 3"/></svg><span class="ocb-txt"><span class="ocb-t">Open bestand</span></span></button></div>
-                    <div class="download-row">
-                        <button class="btn btn-secondary" id="downloadPng" type="button">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                            Afbeelding
-                        </button>
-                        <button class="btn btn-secondary" id="downloadPdf" type="button">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
-                            PDF
-                        </button>
-                        <button class="btn btn-secondary" id="downloadCsv" type="button">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
-                            CSV
-                        </button>
-                    </div>
-                    <p class="ocb-note">Een afbeelding, PDF of CSV kan je niet terug openen.</p>
-                </div>
             </div>
         </div>
         <div class="restart-row" id="restartRow" hidden><button type="button" class="restart-btn" id="ocRestart" title="Alles wissen en opnieuw beginnen">Opnieuw beginnen</button></div>
@@ -1926,7 +1952,6 @@ const ocExport = (() => {
 
             countEl.textContent = stakeholders.length > 0 ? `(${stakeholders.length})` : '';
             
-            ['downloadPng', 'downloadPdf', 'downloadCsv'].forEach(id => { const b = document.getElementById(id); if (!b.dataset.label || b.innerHTML === b.dataset.label) b.disabled = !stakeholders.length; });
             renderExample();
 
             if (stakeholders.length === 0) {
@@ -2025,7 +2050,8 @@ const ocExport = (() => {
         /* Alles wissen, met Ongedaan zolang er intussen niets veranderde */
         const stateSig = () => JSON.stringify([document.getElementById('projectName').value, stakeholders]);
         async function wipeAll() {
-            if (!(await ocConfirmWipe())) return;
+            if (!stakeholders.length && !document.getElementById('projectName').value.trim()) { ocToast('Er is nog niets om te wissen'); return; }
+            if (!(await ocConfirmWipe('Alles wissen in Betrokkenenradar? Alle betrokkenen en de projectnaam verdwijnen. Je kan dit nog ongedaan maken tot je iets anders doet.', 'Alles wissen'))) return;
             const snap = ocStoreSnapshot();
             reset();
             const sig = stateSig();
@@ -2103,9 +2129,22 @@ const ocExport = (() => {
             ocToast('Het voorbeeld is nu van jou');
         }
 
-        function downloadPng(e) { return ocDownload('png', e.currentTarget); }
-
-        function downloadPdf(e) { return ocDownload('pdf', e.currentTarget); }
+        /* Downloaden vanuit het ⋮-menu: de melding onderaan vertelt wat er gebeurt */
+        async function menuDownload(kind) {
+            if (!ITEMS().length) { ocToast('Voeg eerst een betrokkene toe'); return; }
+            if (kind === 'csv') { downloadCsv(); ocToast('CSV gedownload'); return; }
+            ocToast('Bezig met downloaden…');
+            try {
+                await (kind === 'png' ? ocExport.png(buildExport, ocFileName(FILE_PREFIX), { landscape:true })
+                                      : ocExport.pdf(buildExport, ocFileName(FILE_PREFIX), { landscape:true }));
+                ocToast(kind === 'png' ? 'Afbeelding gedownload' : 'PDF gedownload');
+            } catch (e) { ocToast('Downloaden lukte niet. Ben je online?'); }
+        }
+        document.addEventListener('click', e => {
+            const b = e.target.closest('#ocMenu [data-ocm]'); if (!b) return;
+            const a = b.dataset.ocm;
+            if (a === 'wipe') wipeAll(); else menuDownload(a);
+        });
 
         function downloadCsv() {
             const cell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
@@ -2180,9 +2219,7 @@ const ocExport = (() => {
             });
 
             document.getElementById('ocRestart').addEventListener('click', wipeAll);
-            document.getElementById('downloadPng').addEventListener('click', downloadPng);
-            document.getElementById('downloadPdf').addEventListener('click', downloadPdf);
-            document.getElementById('downloadCsv').addEventListener('click', downloadCsv);
+            document.getElementById('ocBegin').addEventListener('click', () => { const n = document.getElementById('stakeholderName'); n.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); n.focus({ preventScroll: true }); });
             document.getElementById('vbLoad').addEventListener('click', loadExample);
             document.getElementById('vbWis').addEventListener('click', clearExample);
             document.getElementById('vbEigen').addEventListener('click', keepExample);
@@ -2348,6 +2385,38 @@ ocBestandKnoppen({
   bevestig: function (t) { return ocConfirmWipe(t, 'Vervang'); },
   toast: function (t) { ocToast(t); }
 });
+</script>
+<script>
+/* ⋮-menu, zoals in de referentietools: openen met klik, tik of toets; sluiten met Escape, een klik ernaast of een keuze */
+(function () {
+  var btn = document.getElementById('ocMenuBtn'), m = document.getElementById('ocMenu');
+  if (!btn || !m) return;
+  function items() { return [].slice.call(m.querySelectorAll('button')).filter(function (b) { return !b.disabled && !b.hidden && b.offsetParent !== null; }); }
+  function open(kb) {
+    if (window.ocMenuVoorOpen) window.ocMenuVoorOpen(m);
+    m.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
+    if (kb) { var f = items()[0]; if (f) f.focus(); }
+  }
+  function close(terug) {
+    if (!m.classList.contains('open')) return;
+    m.classList.remove('open'); btn.setAttribute('aria-expanded', 'false');
+    if (terug) btn.focus();
+  }
+  window.ocMenuSluit = close;
+  btn.addEventListener('click', function (e) { e.stopPropagation(); if (m.classList.contains('open')) close(); else open(e.detail === 0); });
+  document.addEventListener('click', function (e) { if (!(e.target.closest && e.target.closest('.ocm-wrap'))) close(); });
+  m.addEventListener('click', function (e) { if (e.target.closest('button')) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (!m.classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); return; }
+    if (e.key === 'Tab') { close(); return; }
+    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].indexOf(e.key) < 0) return;
+    var l = items(); if (!l.length) return;
+    var i = l.indexOf(document.activeElement); e.preventDefault();
+    i = e.key === 'Home' ? 0 : e.key === 'End' ? l.length - 1 : (i + (e.key === 'ArrowDown' ? 1 : -1) + l.length) % l.length;
+    l[i].focus();
+  }, true);
+})();
 </script>
 <script>
 /* oc-sync: reageert op "Wissen" in de app (ook in andere tabbladen) en geeft Esc door aan de app */
