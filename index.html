@@ -688,6 +688,15 @@
 
         .stakeholder-next:focus { border-style: solid; border-color: #10b981; background: #ffffff; }
         .stakeholder-next::placeholder { color: var(--slate-400); }
+        .wat-input { display:block; width:100%; resize:vertical; min-height:4.25rem; padding:0.625rem 0.75rem; font:inherit; font-size:0.9375rem; line-height:1.45; color:var(--slate-700); background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm); outline:none; }
+        .wat-input:focus { border-color:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,0.15); }
+        .wat-input::placeholder { color:#64748b; }
+        .wat-hint { margin:0.25rem 0 0; font-size:0.75rem; line-height:1.4; color:#64748b; }
+        .stakeholder-wat { display:block; width:100%; margin-top:0.375rem; padding:0.375rem 0.5rem; font:inherit; font-size:0.8125rem; line-height:1.45; color:#475569; background:transparent; border:1px solid transparent; border-radius:6px; resize:none; overflow:hidden; min-height:44px; outline:none; }
+        .stakeholder-wat:hover { border-color:var(--slate-200); background:rgba(255,255,255,0.6); }
+        .stakeholder-wat:placeholder-shown { border:1px dashed var(--slate-200); background:rgba(255,255,255,0.7); }
+        .stakeholder-wat:focus { border:1px solid #10b981; background:#fff; color:var(--slate-700); }
+        .stakeholder-wat::placeholder { color:#64748b; }
 
         .legend-tip {
             display: block;
@@ -1040,7 +1049,7 @@ button:not(:disabled):active, a:active, summary:active, [role="button"]:active {
 .ocs, .ocs-body, .ocw, .menu { overscroll-behavior:contain; }
 body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
 @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; } }
-@media (pointer:coarse), (max-width:760px) { .form-group input[type="text"], .stakeholder-next, .sh-pos select { font-size:16px; } }
+@media (pointer:coarse), (max-width:760px) { .form-group input[type="text"], .wat-input, .stakeholder-next, .stakeholder-wat, .sh-pos select { font-size:16px; } }
 .ocs-back .ocs { max-height:min(86dvh, 720px); }
 @supports (height:100svh) { .matrix-container { max-width:max(320px, calc(100svh - 260px)); } }
 
@@ -1181,6 +1190,12 @@ body:has(.ocs-back), body:has(.ocw-back) { overflow:hidden; }
                         </div>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="stakeholderWat">Wat speelt er? <span style="font-weight:400;color:#64748b">(optioneel)</span></label>
+                        <textarea id="stakeholderWat" class="wat-input" rows="2" maxlength="200" placeholder="Bijv. vreest extra werk aan het loket" aria-describedby="watHint"></textarea>
+                        <p class="wat-hint" id="watHint">Wat houdt deze betrokkene bezig? Een belang, een zorg of een bezwaar, in een zin of twee.</p>
+                    </div>
+
                     <div class="form-group">
                         <label for="stakeholderNext">Volgende stap <span style="font-weight:400;color:#64748b">(optioneel)</span></label>
                         <input type="text" id="stakeholderNext" placeholder="Bijv. 1-op-1 met de schepen voor de stuurgroep" autocomplete="off" maxlength="140">
@@ -1565,7 +1580,7 @@ const ocExport = (() => {
                     <span style="width:9px;height:9px;border-radius:50%;background:${color}"></span>${ocEsc(title)}
                     <span style="font-weight:500;letter-spacing:0;text-transform:none;color:#64748b">· ${ocEsc(sub)}</span></div>
                 ${rows.map(r => `<div data-oc-keep style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:14px;color:#1e293b">
-                    <span>${ocEsc(r.name)}</span><span style="white-space:nowrap;font-size:12px;color:#64748b">${ocEsc(r.meta)}</span></div>`).join('')}
+                    <span>${ocEsc(r.name)}${r.wat ? `<span style="display:block;margin-top:2px;font-size:12px;line-height:1.4;color:#475569">${ocEsc(r.wat)}</span>` : ''}</span><span style="white-space:nowrap;font-size:12px;color:#64748b">${ocEsc(r.meta)}</span></div>`).join('')}
             </div>`;
         }
 
@@ -1579,9 +1594,9 @@ const ocExport = (() => {
                 + groups.map(g => ocGroupHTML(g.color, g.text, g.name, g.sub,
                 stakeholders.filter(s => !s.todo && qOf(s) === g)
                      .sort((a, b) => (b.contribution + b.willingness) - (a.contribution + a.willingness))
-                     .map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, meta: `bijdrage ${s.contribution} · wil meewerken ${s.willingness}` })))).join('')
+                     .map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, wat: s.wat ? 'Wat speelt er: ' + s.wat : '', meta: `bijdrage ${s.contribution} · wil meewerken ${s.willingness}` })))).join('')
                 + ocGroupHTML('#94a3b8', '#475569', 'Nog in te schatten', 'positie nog niet bepaald',
-                    stakeholders.filter(s => s.todo).map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, meta: 'nog niet in de radar' })))
+                    stakeholders.filter(s => s.todo).map(s => ({ name: s.next ? `${s.name} → ${s.next}` : s.name, wat: s.wat ? 'Wat speelt er: ' + s.wat : '', meta: 'nog niet in de radar' })))
                 + `<div data-oc-keep style="margin-top:6px;font-size:11px;line-height:1.5;color:#64748b">${groups.map(g =>
                     `<div style="margin-bottom:4px"><b style="color:${g.text}">${ocEsc(g.name)}</b>: ${ocEsc(g.tip)}</div>`).join('')}</div>`;
         }
@@ -1598,7 +1613,7 @@ const ocExport = (() => {
             if (isExample) { ocShare.clear('stakeholders'); updateImportBtn(); return; }
             ocShare.publish('stakeholders', 'Betrokkenenradar', [{
                 name: project.trim() || 'Betrokkenen',
-                items: stakeholders.map(x => ({ type: 'betrokkene', text: x.name, note: x.todo ? 'nog in te schatten' : qOf(x).name }))
+                items: stakeholders.map(x => ({ type: 'betrokkene', text: x.name, note: shareNote(x) }))
             }, {
                 name: 'Kerncijfers',
                 // Wie nog niet ingeschat is (bv. net overgenomen), telt niet mee in de kerncijfers.
@@ -1614,6 +1629,11 @@ const ocExport = (() => {
             updateImportBtn();
         }
         const assessed = () => stakeholders.filter(x => !x.todo);
+        /* Doorgeven: aanpak, en wat er speelt (samen max 200 tekens) */
+        function shareNote(x) {
+            const t = [x.todo ? 'nog in te schatten' : qOf(x).name, x.wat || ''].filter(Boolean).join(' · ');
+            return t.length > 200 ? t.slice(0, 199).trimEnd() + '…' : t;
+        }
         function loadState() {
             try {
                 const d = JSON.parse(localStorage.getItem(STORE_KEY));
@@ -1635,6 +1655,7 @@ const ocExport = (() => {
                 contribution: clamp10(old ? x.power : x.contribution),
                 willingness: clamp10(old ? x.interest : x.willingness),
                 next: x.next ? String(x.next).slice(0, 140) : '',
+                ...(typeof x.wat === 'string' && x.wat.trim() ? { wat: x.wat.trim().slice(0, 200) } : {}),
                 ...(x.todo === true ? { todo: true } : {})
             };
         }
@@ -1880,7 +1901,7 @@ const ocExport = (() => {
 
                 const dot = document.createElement('div');
                 dot.className = `point-dot q-${pos.quadrant.class}`;
-                dot.title = `${pos.name}\nBijdrage: ${pos.contribution}, Wil meewerken: ${pos.willingness}\n→ ${pos.quadrant.name}${pos.next ? '\nVolgende stap: ' + pos.next : ''}`;
+                dot.title = `${pos.name}\nBijdrage: ${pos.contribution}, Wil meewerken: ${pos.willingness}\n→ ${pos.quadrant.name}${pos.wat ? '\nWat speelt er: ' + pos.wat : ''}${pos.next ? '\nVolgende stap: ' + pos.next : ''}`;
                 point.appendChild(dot);
 
                 // Add stack badge if multiple at same position
@@ -1978,6 +1999,7 @@ const ocExport = (() => {
                                 ? '<span class="sh-todo">nog in te schatten</span>'
                                 : `<span class="stakeholder-strategy q-${q.class}" title="${esc(q.tip)}">${q.name}</span>`}</div>
                             ${s.todo ? `<button type="button" class="sh-ok" data-ok="${i}">Klopt zo (5 en 5)</button>` : ''}
+                            <textarea class="stakeholder-wat" data-wat="${i}" rows="1" maxlength="200" placeholder="Wat speelt er?" aria-label="Wat speelt er bij ${esc(s.name)}">${esc(s.wat || '')}</textarea>
                             <input class="stakeholder-next" data-next="${i}" value="${esc(s.next || '')}" placeholder="Volgende stap…" aria-label="Volgende stap voor ${esc(s.name)}" maxlength="140">
                         </div>
                         <button class="stakeholder-delete" type="button" data-del="${i}" title="Verwijderen" aria-label="Verwijder ${esc(s.name)}">
@@ -1986,7 +2008,10 @@ const ocExport = (() => {
                     </div>
                 `;
             }).join('');
+            container.querySelectorAll('.stakeholder-wat').forEach(fitWat);
         }
+        /* Het veld "Wat speelt er?" groeit mee met de tekst */
+        function fitWat(t) { t.style.height = 'auto'; t.style.height = Math.max(44, t.scrollHeight + 2) + 'px'; }
 
         function addStakeholder() {
             const nameInput = document.getElementById('stakeholderName');
@@ -2010,9 +2035,11 @@ const ocExport = (() => {
             const contribution = clamp10(document.getElementById('powerSlider').value);
             const willingness = clamp10(document.getElementById('interestSlider').value);
             const next = document.getElementById('stakeholderNext').value.trim().slice(0, 140);
+            const wat = document.getElementById('stakeholderWat').value.replace(/\s+/g, ' ').trim().slice(0, 200);
 
-            stakeholders.push({ name: name.slice(0, 80), contribution, willingness, next });
+            stakeholders.push(Object.assign({ name: name.slice(0, 80), contribution, willingness, next }, wat ? { wat } : {}));
             document.getElementById('stakeholderNext').value = '';
+            document.getElementById('stakeholderWat').value = '';
 
             // Visual feedback
             addBtn.textContent = '✓ Toegevoegd';
@@ -2073,6 +2100,7 @@ const ocExport = (() => {
             document.getElementById('projectName').value = ocProject('');
             document.getElementById('stakeholderName').value = '';
             document.getElementById('stakeholderNext').value = '';
+            document.getElementById('stakeholderWat').value = '';
             document.getElementById('powerSlider').value = 5;
             document.getElementById('interestSlider').value = 5;
             document.getElementById('powerValue').textContent = '5';
@@ -2095,16 +2123,16 @@ const ocExport = (() => {
         let projectBeforeExample = '';
         function loadExample() {
             if (stakeholders.length) return;
-            const S = (name, contribution, willingness, next) => ({ name, contribution, willingness, next });
+            const S = (name, contribution, willingness, next, wat) => Object.assign({ name, contribution, willingness, next }, wat ? { wat } : {});
             projectBeforeExample = document.getElementById('projectName').value;
             stakeholders = [
                 S('Afdelingshoofd', 9, 8, 'Wekelijks kort overleg over de planning'),
-                S('ICT-dienst', 8, 3, 'Gesprek over capaciteit en de koppeling met het oude systeem'),
-                S('Loketteam', 7, 4, 'Proefdraaien met drie collega’s van het loket'),
+                S('ICT-dienst', 8, 3, 'Gesprek over capaciteit en de koppeling met het oude systeem', 'Heeft dit jaar al veel projecten lopen. Vreest dat de koppeling met het oude systeem te veel tijd vraagt.'),
+                S('Loketteam', 7, 4, 'Proefdraaien met drie collega’s van het loket', 'Is bang voor extra werk in de overgang. Wil zeker weten dat mensen zonder computer nog geholpen worden.'),
                 S('Juridische dienst', 6, 6, 'Privacytoets samen voorbereiden'),
                 S('Communicatie', 4, 9, 'Nieuwsbrief over de nieuwe aanvraagroute'),
-                S('Aanvragers', 3, 7, 'Korte bevraging na de eerste aanvragen'),
-                S('Vakbond', 3, 3, 'Toelichten op het formeel overleg, vóór de beslissing')
+                S('Aanvragers', 3, 7, 'Korte bevraging na de eerste aanvragen', 'Willen sneller weten of hun aanvraag in orde is.'),
+                S('Vakbond', 3, 3, 'Toelichten op het formeel overleg, vóór de beslissing', 'Wil weten of de nieuwe werkwijze jobs of uurroosters verandert.')
             ];
             isExample = true;
             document.getElementById('projectName').value = 'Digitaal premieloket';
@@ -2148,10 +2176,10 @@ const ocExport = (() => {
 
         function downloadCsv() {
             const cell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
-            let csv = 'Betrokkene;Bijdrage aan succes;Wil meewerken;Aanpak;Volgende stap\n';
+            let csv = 'Betrokkene;Bijdrage aan succes;Wil meewerken;Aanpak;Wat speelt er?;Volgende stap\n';
             stakeholders.forEach(s => {
                 const q = qOf(s);
-                csv += [cell(s.name), s.contribution, s.willingness, cell(s.todo ? 'Nog in te schatten' : q.name), cell(s.next || '')].join(';') + '\n';
+                csv += [cell(s.name), s.contribution, s.willingness, cell(s.todo ? 'Nog in te schatten' : q.name), cell(s.wat || ''), cell(s.next || '')].join(';') + '\n';
             });
 
             const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2179,11 +2207,20 @@ const ocExport = (() => {
                     const again = document.querySelector(`select[data-pos="${key}"][data-i="${idx}"]`); if (again) again.focus();
                     return;
                 }
+                const w = e.target && e.target.dataset ? e.target.dataset.wat : undefined;
+                if (w !== undefined && stakeholders[+w]) {
+                    const v = e.target.value.replace(/\s+/g, ' ').trim().slice(0, 200);
+                    if (v) stakeholders[+w].wat = v; else delete stakeholders[+w].wat;
+                    saveState(); renderMatrix();
+                    return;
+                }
                 const i = e.target && e.target.dataset ? e.target.dataset.next : undefined;
                 if (i === undefined || !stakeholders[+i]) return;
                 stakeholders[+i].next = e.target.value.trim().slice(0, 140);
                 saveState(); renderMatrix(); renderFirstBox();
             });
+            document.getElementById('stakeholderList').addEventListener('input', e => { if (e.target.classList && e.target.classList.contains('stakeholder-wat')) fitWat(e.target); });
+            document.getElementById('stakeholderList').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('stakeholder-wat')) { e.preventDefault(); e.target.blur(); } });
             document.getElementById('stakeholderList').addEventListener('click', e => {
                 const del = e.target.closest('[data-del]');
                 if (del) { deleteStakeholder(+del.dataset.del); return; }
