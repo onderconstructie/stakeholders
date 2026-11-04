@@ -1432,7 +1432,9 @@ function ocProject(fb) { try { const p = JSON.parse(localStorage.getItem('oc.pro
      ]);                                   // aanroepen na elke bewaring
      ocShare.clear('raci');                // bij "Alles wissen"
      const gekozen = await ocShare.pick({ types:['betrokkene'], self:'weerstand', title:'Doelgroepen overnemen' });
-     // geeft [] terug bij annuleren, anders de aangevinkte items (met .source en .list erbij)
+     // geeft [] terug bij annuleren, anders de aangevinkte items (met .source, .bronId en .list erbij)
+     // Afspraak: een tool geeft wat ze overnam (bronId) NIET opnieuw door, tenzij ze er een eigen oordeel aan toevoegde
+     // (een score, een eigenaar, een datum). Zo blijft de bron de baas en komt wat daar verwijderd is niet terug.
      ocShare.pick({ ..., have:['Budget goedkeuren'] })  // optioneel: wat de tool al heeft, staat uitgegrijsd ("staat er al")
      ocShare.pick({ ..., vink:false })    // niets vooraf aanvinken;  notes:false  toont geen notities (voor wie alleen namen neemt)
      window.ocHave = types => [...]       // optioneel per tool: dan telt de knop "Overnemen uit andere tools" alleen wat nieuw is
@@ -1588,7 +1590,7 @@ const ocShare = (() => {
       document.addEventListener('keydown', onKey, true);
       back.querySelector('.ocs-cancel').addEventListener('click', () => close([]));
       ok.addEventListener('click', () => close(boxes().filter(b => b.checked).map(b => {
-        const s = src[+b.dataset.s]; return { ...s.items[+b.dataset.i], source: s.tool, list: s.list };
+        const s = src[+b.dataset.s]; return { ...s.items[+b.dataset.i], source: s.tool, bronId: s.id, list: s.list };
       })));
       const first = back.querySelector('input:not(:disabled),.ocs-cancel'); first && first.focus();
     });
@@ -1828,9 +1830,11 @@ const ocExport = (() => {
             const project = document.getElementById('projectName').value;
             try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({ model: 2, project, items: stakeholders }, isExample ? { voorbeeld: true } : {}))); } catch (e) {}
             if (isExample) { ocShare.clear('stakeholders'); updateImportBtn(); return; }
+            // Wie uit een andere tool overgenomen werd (x.van), geven we pas door als je hem hier inschatte:
+            // het vak in de radar is ons eigen oordeel. Zolang hij 'nog in te schatten' is, blijft de andere tool de baas.
             ocShare.publish('stakeholders', 'Betrokkenenradar', [{
                 name: project.trim() || 'Betrokkenen',
-                items: stakeholders.map(x => ({ type: 'betrokkene', text: x.name, note: shareNote(x) }))
+                items: stakeholders.filter(x => !(x.van && x.todo)).map(x => ({ type: 'betrokkene', text: x.name, note: shareNote(x) }))
             }, {
                 name: 'Kerncijfers',
                 // Wie nog niet ingeschat is (bv. net overgenomen), telt niet mee in de kerncijfers.
@@ -1879,7 +1883,8 @@ const ocExport = (() => {
                 next: x.next ? String(x.next).slice(0, 140) : '',
                 ...(typeof x.wat === 'string' && x.wat.trim() ? { wat: x.wat.trim().slice(0, 200) } : {}),
                 ...(x.todo === true ? { todo: true } : {}),
-                ...(x.std === true ? { std: true } : {})
+                ...(x.std === true ? { std: true } : {}),
+                ...(typeof x.van === 'string' && x.van ? { van: x.van.slice(0, 40) } : {})   // herkomst: overgenomen uit die tool
             };
         }
         function showMigrateNote() {
@@ -1909,7 +1914,7 @@ const ocExport = (() => {
                 if (!key) return;
                 if (have.has(key)) { skipped++; return; }
                 have.add(key); n++;
-                stakeholders.push({ name: p.text.trim().slice(0, NAAM_MAX), contribution: 5, willingness: 5, next: '', todo: true });
+                stakeholders.push({ name: p.text.trim().slice(0, NAAM_MAX), contribution: 5, willingness: 5, next: '', todo: true, van: p.bronId || p.source || 'ander' });
             });
             renderMatrix();
             renderStakeholderList();
