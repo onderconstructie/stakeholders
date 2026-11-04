@@ -12,7 +12,7 @@
     <meta name="oc:kort" content="Wie moet mee, en wil dat ook?">
     <meta name="oc:volgorde" content="30">
     <meta name="oc:traject" content="verandering:1">
-    <meta name="oc:opslag" content="stakeholders.v1, stakeholders.migratie-gemeld">
+    <meta name="oc:opslag" content="stakeholders.v1, stakeholders.migratie-gemeld, oc.share.stakeholders">
 <link rel="stylesheet" href="/fonts/fonts.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23f8fafc' stroke='%23e2e8f0' stroke-width='1.5'/%3E%3Ccircle cx='12.2' cy='14.8' r='2.3' fill='%2364748b'/%3E%3Cpath d='M8 22.2V20.4a4.2 2.3 0 0 1 4.2 -2.3a4.2 2.3 0 0 1 4.2 2.3V22.2Z' fill='%2364748b'/%3E%3Ccircle cx='27.8' cy='14.8' r='2.3' fill='%2364748b'/%3E%3Cpath d='M23.6 22.2V20.4a4.2 2.3 0 0 1 4.2 -2.3a4.2 2.3 0 0 1 4.2 2.3V22.2Z' fill='%2364748b'/%3E%3Ccircle cx='20' cy='12.4' r='2.9' fill='%2310b981'/%3E%3Cpath d='M14.6 21.9V19.7a5.4 3 0 0 1 5.4 -3a5.4 3 0 0 1 5.4 3V21.9Z' fill='%2310b981'/%3E%3C/svg%3E">
     <style>
@@ -367,7 +367,8 @@
             margin-top: 0.5rem;
         }
 
-        .btn-import {
+        /* Vorm en onderregel van de knop "Overnemen uit andere tools" komen uit het gedeelde oc-sync-blok */
+        #importBtn {
             width: 100%;
             margin-top: 0.5rem;
         }
@@ -595,6 +596,9 @@
             font-weight: 600;
             color: var(--slate-700);
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-sizing: border-box;
             pointer-events: none;
             z-index: 15;
             background: rgba(255,255,255,0.95);
@@ -932,8 +936,6 @@
         @media (max-width:768px) { .to-list.has { display:block; } }
         @media (max-width:360px) { .stakeholder-meta { flex-wrap:wrap; } .card { padding:1rem; } .matrix-wrapper { padding:1rem; } }
         input[type=range]:focus-visible { outline:2px solid #047857 !important; outline-offset:4px; }
-        .oc-import { color:#047857; min-height:44px; }
-        .oc-import:focus-visible { outline-color:#047857; }
         .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
         .card-title, .slider-hints, .empty-state { color:#64748b; }
@@ -972,6 +974,10 @@
         .stakeholder-delete { width:44px; height:44px; margin:-0.5rem -0.75rem -0.5rem 0; }
         .todo-strip { margin-top:0.875rem; padding:0.625rem 0.75rem; border:1px dashed #94a3b8; border-radius:10px; font-size:0.8125rem; color:#334155; background:repeating-linear-gradient(135deg, #fff 0 8px, #f8fafc 8px 16px); }
         .todo-strip[hidden] { display:none; }
+        /* Lange namen ("Céline Van den Bossche-Vermeiren, coördinator …") maken de pagina nooit breder dan het scherm */
+        .main-grid > * { min-width: 0; }
+        .todo-strip span.chip { max-width: 100%; overflow-wrap: anywhere; }
+        .first-box, .stakeholder-list, .todo-strip { overflow-wrap: anywhere; }
         .todo-strip b { font-weight:600; }
         .todo-strip span.chip { display:inline-block; margin:0.25rem 0.25rem 0 0; padding:0.0625rem 0.5rem; border:1px dashed #64748b; border-radius:999px; background:#fff; }
         .axis-label::before { content:''; position:absolute; inset:-7px -4px; }
@@ -1321,10 +1327,7 @@ details.explain.oc-u .oc-u-noot a:hover { text-decoration-color:var(--u-donker);
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                         Toevoegen
                     </button>
-                    <button class="btn btn-secondary btn-import" id="importBtn" type="button" hidden>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-                        Overnemen uit…
-                    </button>
+                    <button class="oc-import btn-import" id="importBtn" type="button" data-oc-types="betrokkene" hidden>Overnemen uit andere tools</button>
                     <p class="import-note" id="importNote" role="status" hidden></p>
                     <button type="button" class="to-list" id="toList">Naar het overzicht</button>
                 </div>
@@ -1386,7 +1389,7 @@ details.explain.oc-u .oc-u-noot a:hover { text-decoration-color:var(--u-donker);
           <div class="inner">
             <p>Met de Betrokkenenradar zie je wie je project mee kan maken of breken, en hoe graag die mensen meewerken. Gebruik hem bij de start van een project, en kijk hem na als er iets verandert.</p>
             <ul>
-              <li><b>Zet iedereen op een rij.</b> Typ een naam: een persoon, een team of een dienst. Staan ze al in een andere tool, dan neem je ze over met "Overnemen uit…".</li>
+              <li><b>Zet iedereen op een rij.</b> Typ een naam: een persoon, een team of een dienst. Staan ze al in een andere tool, dan neem je ze over met "Overnemen uit andere tools".</li>
               <li><b>Schat twee dingen in.</b> Hoeveel kan die betrokkene bijdragen aan het succes, en hoe graag wil die meewerken? Kies telkens een cijfer van 1 tot 10.</li>
               <li><b>Lees de radar.</b> Elke betrokkene komt in een van vier vakken: nauw betrekken, vroeg opzoeken, op de hoogte houden of in het oog houden. Het vak zegt welke aanpak past.</li>
               <li><b>Begin bij wie het meest telt.</b> Onder "Wie spreek je eerst aan" staan wie veel kan bijdragen maar (nog) weinig wil meewerken. Noteer wat er speelt en wat je volgende stap is.</li>
@@ -1430,6 +1433,11 @@ function ocProject(fb) { try { const p = JSON.parse(localStorage.getItem('oc.pro
      ocShare.clear('raci');                // bij "Alles wissen"
      const gekozen = await ocShare.pick({ types:['betrokkene'], self:'weerstand', title:'Doelgroepen overnemen' });
      // geeft [] terug bij annuleren, anders de aangevinkte items (met .source en .list erbij)
+     ocShare.pick({ ..., have:['Budget goedkeuren'] })  // optioneel: wat de tool al heeft, staat uitgegrijsd ("staat er al")
+     ocShare.pick({ ..., vink:false })    // niets vooraf aanvinken;  notes:false  toont geen notities (voor wie alleen namen neemt)
+     window.ocHave = types => [...]       // optioneel per tool: dan telt de knop "Overnemen uit andere tools" alleen wat nieuw is
+   Dezelfde tekst van dezelfde soort uit meerdere tools tonen en tellen we één keer (tools geven overgenomen werk ook weer door).
+   ?van=<tool> vinkt alleen die bron aan, en daarin de lijst van het actieve project als die er is.
 */
 const ocShare = (() => {
   const PREFIX = 'oc.share.';
@@ -1445,7 +1453,8 @@ const ocShare = (() => {
         name: String(l.name || '').slice(0, 80),
         items: (l.items || []).filter(i => i && i.type && String(i.text || '').trim())
           .slice(0, 300).map(i => ({ type:i.type, text:String(i.text).trim().slice(0, 300),
-            note: i.note ? String(i.note).slice(0, 200) : undefined, who: i.who || undefined, when: i.when || undefined }))
+            note: i.note ? String(i.note).slice(0, 200) : undefined, who: typeof i.who === 'string' && i.who.trim() ? i.who.trim().slice(0, 120) : undefined,
+            when: typeof i.when === 'string' && i.when.trim() ? i.when.trim().slice(0, 40) : undefined }))
       })).filter(l => l.items.length);
       if (!clean.length) { localStorage.removeItem(PREFIX + id); return; }
       localStorage.setItem(PREFIX + id, JSON.stringify({ id, tool, updated: Date.now(), lists: clean }));
@@ -1454,7 +1463,7 @@ const ocShare = (() => {
   function clear(id) { try { localStorage.removeItem(PREFIX + id); } catch {} }
 
   // Elke bron apart: één kapotte sleutel mag de andere niet verbergen.
-  function sources(types, self) {
+  function sources(types, self, voorkeur) {
     const out = [];
     let keys = [];
     try { for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i)); } catch { return out; }
@@ -1465,13 +1474,26 @@ const ocShare = (() => {
         if (!d || !Array.isArray(d.lists)) return;
         d.lists.forEach(l => {
           if (!l || !Array.isArray(l.items)) return;
-          const items = l.items.filter(it => it && types.includes(it.type) && typeof it.text === 'string');
+          const items = l.items.filter(it => it && types.includes(it.type) && typeof it.text === 'string' && it.text.trim())
+            .map(it => ({ ...it, who: typeof it.who === 'string' ? it.who : undefined, when: typeof it.when === 'string' ? it.when : undefined }));
           if (items.length) out.push({ tool: String(d.tool || d.id || k.slice(PREFIX.length)), id: d.id, updated: +d.updated || 0, list: String(l.name || ''), items });
         });
       } catch {}
     });
-    return out.sort((a, b) => (b.updated || 0) - (a.updated || 0));
+    out.sort((a, b) => (b.updated || 0) - (a.updated || 0));
+    // Elke tekst van elke soort één keer. Wie houdt hem? De bron uit ?van=, dan de rijkste (notitie, wie, wanneer),
+    // dan de grootste lijst (meestal het origineel, niet een tool die het overnam), dan de recentste.
+    // Mist de gekozen versie een wie of wanneer die een andere bron wel heeft, dan vullen we aan.
+    const score = (s, it) => [s.id === voorkeur ? 1 : 0, (it.note ? 2 : 0) + (it.who ? 1 : 0) + (it.when ? 1 : 0), s.items.length, s.updated || 0];
+    const beter = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] > b[i]; return false; };
+    const best = new Map();
+    out.forEach(s => s.items.forEach(it => { const k = it.type + '|' + norm(it.text), sc = score(s, it), e = best.get(k); if (!e || beter(sc, e.sc)) best.set(k, { it, sc }); }));
+    out.forEach(s => s.items.forEach(it => { const e = best.get(it.type + '|' + norm(it.text)).it; if (e !== it) { if (!e.who && it.who) e.who = it.who; if (!e.when && it.when) e.when = it.when; } }));
+    return out.map(s => ({ ...s, items: s.items.filter(it => best.get(it.type + '|' + norm(it.text)).it === it) }))
+      .filter(s => s.items.length);
   }
+  // Vergelijken zonder hoofdletters, dubbele spaties of leestekens aan de rand
+  function norm(v) { return String(v || '').normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim().replace(/^[\s.,;:!?·-]+|[\s.,;:!?·-]+$/g, ''); }
 
   let styled = false;
   function style() {
@@ -1496,7 +1518,9 @@ const ocShare = (() => {
       .ocs-src-head span{font-size:.75rem;color:#64748b}
       .ocs-all{margin-left:auto;font:inherit;font-size:.8125rem;color:#047857;background:none;border:0;cursor:pointer;padding:.25rem .5rem;min-height:44px;border-radius:6px}
       .ocs-all:hover{background:#d1fae5}
-      .ocs-item{display:flex;align-items:flex-start;gap:.625rem;padding:.625rem .25rem;min-height:44px;box-sizing:border-box;border-top:1px solid #f1f5f9;cursor:pointer;font-size:.9375rem;line-height:1.4}
+      .ocs-item{display:flex;align-items:flex-start;gap:.625rem;padding:.625rem .25rem;min-height:44px;box-sizing:border-box;border-top:1px solid #f1f5f9;cursor:pointer;font-size:.9375rem;line-height:1.4;overflow-wrap:anywhere;min-width:0}
+      .ocs-item.al{cursor:default;color:#64748b}.ocs-item.al em{font-style:normal;font-size:.75rem;font-weight:600;color:#047857;margin-left:.375rem;white-space:nowrap}
+      .ocs-src-head b,.ocs-src-head span{overflow-wrap:anywhere;min-width:0}.ocs-note{margin:.25rem 0 .5rem;padding:.5rem .75rem;border-radius:10px;background:#f8fafc;color:#475569;font-size:.875rem;line-height:1.45}
       .ocs-item input{width:18px;height:18px;margin-top:.125rem;accent-color:#10b981;flex:none}
       .ocs-item small{display:block;font-size:.75rem;color:#64748b}
       .ocs-empty{padding:1.5rem .25rem;color:#64748b;font-size:.9375rem;line-height:1.5}
@@ -1509,21 +1533,24 @@ const ocShare = (() => {
     document.head.appendChild(s);
   }
 
-  function pick({ types, self, title, intro }) {
+  function pick({ types, self, title, intro, have, vink, notes }) {
     style();
     return new Promise(resolve => {
-      const src = sources(types, self);
+      let van = window.ocVan || ''; try { van = van || new URLSearchParams(location.search).get('van') || ''; } catch {}
+      const src = sources(types, self, van), terug = document.activeElement;
+      const heeft = new Set((have || []).map(norm));
+      const vanNaam = van && !src.some(s => s.id === van) ? van : '';
       const back = document.createElement('div');
       back.className = 'ocs-back';
       const what = types.map(t => LABEL[t] || t).join(' of ');
       back.innerHTML = `<div class="ocs" role="dialog" aria-modal="true" aria-label="${esc(title || 'Overnemen')}">
         <div class="ocs-head"><div class="ocs-title">${esc(title || 'Overnemen uit een andere tool')}</div>
           <div class="ocs-sub">${esc(intro || `Kies welke ${what} je wil overnemen.`)}</div></div>
-        <div class="ocs-body">${src.length ? src.map((s, si) => `
+        <div class="ocs-body">${vanNaam ? `<p class="ocs-note">Uit die tool ligt nog niets klaar. Hieronder staat wat andere tools aanbieden.</p>` : ''}${src.length ? src.map((s, si) => `
           <div class="ocs-src"><div class="ocs-src-head"><b>${esc(s.tool)}</b><span>${esc(s.list)} · ${s.items.length}</span>
             <button class="ocs-all" type="button" data-all="${si}">alles</button></div>
-            ${s.items.map((it, ii) => `<label class="ocs-item"><input type="checkbox" data-s="${si}" data-i="${ii}">
-              <span>${esc(it.text)}${it.who || it.when || it.note ? `<small>${esc([it.who, datum(it.when), it.note].filter(Boolean).join(' · '))}</small>` : ''}</span></label>`).join('')}
+            ${s.items.map((it, ii) => { const al = heeft.has(norm(it.text)); return `<label class="ocs-item${al ? ' al' : ''}"><input type="checkbox" data-s="${si}" data-i="${ii}"${al ? ' disabled' : ''}>
+              <span>${esc(it.text)}${al ? '<em>staat er al</em>' : ''}${it.who || it.when || (notes !== false && it.note) ? `<small>${esc([it.who, datum(it.when), notes !== false && it.note].filter(Boolean).join(' · '))}</small>` : ''}</span></label>`; }).join('')}
           </div>`).join('') : `<p class="ocs-empty">Er zijn nog geen ${esc(what)} om over te nemen. Vul ze eerst in een andere tool van Onder Constructie in, dan verschijnen ze hier.</p>`}
         </div>
         <div class="ocs-foot"><button class="ocs-btn ocs-cancel" type="button">Annuleer</button>
@@ -1531,25 +1558,39 @@ const ocShare = (() => {
       document.body.appendChild(back);
       requestAnimationFrame(() => back.classList.add('open'));
       const ok = back.querySelector('.ocs-ok');
-      const boxes = () => [...back.querySelectorAll('input[type=checkbox]')];
+      const boxes = () => [...back.querySelectorAll('input[type=checkbox]:not(:disabled)')];
       const sync = () => { const n = boxes().filter(b => b.checked).length; ok.disabled = !n; ok.textContent = n ? `Neem ${n} over` : 'Neem over'; };
-      // Eén bron, of geopend vanuit een tool (?van=<tool>): die items staan al aangevinkt.
-      let van = window.ocVan || ''; try { van = van || new URLSearchParams(location.search).get('van') || ''; } catch {}
-      boxes().forEach(b => { const s = src[+b.dataset.s]; if (src.length === 1 || (van && s.id === van)) b.checked = true; }); sync();
+      // Geopend vanuit een tool (?van=<tool>): alleen die bron aanvinken, en daarin de lijst van het actieve project als die er is.
+      // Zonder ?van= en met één bron: die staat aangevinkt.
+      let proj = ''; try { proj = norm((JSON.parse(localStorage.getItem('oc.project') || 'null') || {}).name); } catch {}
+      const vanSrc = van ? src.filter(s => s.id === van) : [];
+      const vanProj = proj ? vanSrc.filter(s => norm(s.list) === proj) : [];
+      // Alleen vanuit een link (?van=) staat iets vooraf aangevinkt. Anders kies je zelf (of tik op "alles"):
+      // één tik op het punt dat je wil, mag nooit de rest overnemen.
+      const aan = vink === false || !van ? [] : (vanProj.length ? vanProj : vanSrc);
+      boxes().forEach(b => { if (aan.includes(src[+b.dataset.s])) b.checked = true; }); sync();
       back.addEventListener('change', sync);
       back.addEventListener('click', e => {
         const a = e.target.closest('[data-all]');
         if (a) { const bs = boxes().filter(b => b.dataset.s === a.dataset.all); const all = bs.every(b => b.checked); bs.forEach(b => b.checked = !all); sync(); }
         if (e.target === back) close([]);
       });
-      function close(v) { document.removeEventListener('keydown', onKey, true); back.remove(); resolve(v); }
-      function onKey(e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close([]); } }
+      function close(v) { document.removeEventListener('keydown', onKey, true); back.remove(); try { if (terug && terug.isConnected) terug.focus({ preventScroll:true }); } catch {} resolve(v); }
+      function onKey(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close([]); return; }
+        if (e.key !== 'Tab') return;   // de focus blijft in de kiezer
+        const f = [...back.querySelectorAll('input:not(:disabled),button:not(:disabled)')].filter(x => x.offsetParent !== null);
+        if (!f.length) return;
+        const i = f.indexOf(document.activeElement);
+        if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && (i === f.length - 1 || i < 0)) { e.preventDefault(); f[0].focus(); }
+      }
       document.addEventListener('keydown', onKey, true);
       back.querySelector('.ocs-cancel').addEventListener('click', () => close([]));
       ok.addEventListener('click', () => close(boxes().filter(b => b.checked).map(b => {
         const s = src[+b.dataset.s]; return { ...s.items[+b.dataset.i], source: s.tool, list: s.list };
       })));
-      const first = back.querySelector('input,.ocs-cancel'); first && first.focus();
+      const first = back.querySelector('input:not(:disabled),.ocs-cancel'); first && first.focus();
     });
   }
 
@@ -1805,9 +1846,14 @@ const ocExport = (() => {
             updateImportBtn();
         }
         const assessed = () => stakeholders.filter(x => !x.todo);
+        // Een naam mag lang zijn ("Céline Van den Bossche-Vermeiren, coördinator eerstelijnshulp en schuldbemiddeling"):
+        // we kappen niet midden in die naam af, anders herkent de kiezer hem niet meer als "staat er al".
+        const NAAM_MAX = 160;
         /* Doorgeven: aanpak, en wat er speelt (samen max 200 tekens) */
+        // Het vak (bv. "In het oog houden") gaat alleen mee als iemand echt ingeschat is:
+        // niet bij wie toegevoegd werd met de schuifjes nog in de standaardstand (std).
         function shareNote(x) {
-            const t = [x.todo ? 'nog in te schatten' : qOf(x).name, x.wat || ''].filter(Boolean).join(' · ');
+            const t = [x.todo ? 'nog in te schatten' : x.std ? '' : qOf(x).name, x.wat || ''].filter(Boolean).join(' · ');
             return t.length > 200 ? t.slice(0, 199).trimEnd() + '…' : t;
         }
         function loadState() {
@@ -1827,12 +1873,13 @@ const ocExport = (() => {
         function normalize(x) {
             const old = !('contribution' in x) && ('power' in x || 'interest' in x);
             return {
-                name: String(x.name).slice(0, 80),
+                name: String(x.name).slice(0, NAAM_MAX),
                 contribution: clamp10(old ? x.power : x.contribution),
                 willingness: clamp10(old ? x.interest : x.willingness),
                 next: x.next ? String(x.next).slice(0, 140) : '',
                 ...(typeof x.wat === 'string' && x.wat.trim() ? { wat: x.wat.trim().slice(0, 200) } : {}),
-                ...(x.todo === true ? { todo: true } : {})
+                ...(x.todo === true ? { todo: true } : {}),
+                ...(x.std === true ? { std: true } : {})
             };
         }
         function showMigrateNote() {
@@ -1843,25 +1890,34 @@ const ocExport = (() => {
             const btn = document.getElementById('importBtn');
             if (btn) btn.hidden = ocShare.count(['betrokkene'], 'stakeholders') === 0;
         }
+        // Wat de radar al heeft: de kiezer grijst het uit, en de knop telt het niet als nieuw
+        const ocAlNamen = () => stakeholders.map(x => x.name);
+        window.ocHave = types => { try { return types.includes('betrokkene') ? ocAlNamen() : []; } catch (e) { return []; } };
         async function importStakeholders() {
-            const picked = await ocShare.pick({ types: ['betrokkene'], self: 'stakeholders', title: 'Betrokkenen overnemen',
+            const namen = ocAlNamen();
+            const picked = await ocShare.pick({ types: ['betrokkene'], self: 'stakeholders', title: 'Betrokkenen overnemen', have: namen,
                 intro: 'Kies wie je in de radar wil zetten. Ze staan eerst apart als ‘nog in te schatten’ en tellen pas mee zodra je hun bijdrage en hoe graag ze meewerken instelt.' });
             if (!picked.length) return;
             const have = new Set(stakeholders.map(x => x.name.trim().toLowerCase()));
-            let n = 0;
+            // Wat in de kiezer al grijs stond ("staat er al") telt mee in de melding
+            const kiesNorm = v => String(v || '').normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim().replace(/^[\s.,;:!?·-]+|[\s.,;:!?·-]+$/g, '');
+            const hk = new Set(namen.map(kiesNorm)), grijs = new Set();
+            try { ocShare.sources(['betrokkene'], 'stakeholders').forEach(s => s.items.forEach(it => { const k = kiesNorm(it.text); if (hk.has(k)) grijs.add(k); })); } catch (e) {}
+            let n = 0, skipped = grijs.size;
             picked.forEach(p => {
                 const key = p.text.trim().toLowerCase();
-                if (!key || have.has(key)) return;
+                if (!key) return;
+                if (have.has(key)) { skipped++; return; }
                 have.add(key); n++;
-                stakeholders.push({ name: p.text.trim().slice(0, 80), contribution: 5, willingness: 5, next: '', todo: true });
+                stakeholders.push({ name: p.text.trim().slice(0, NAAM_MAX), contribution: 5, willingness: 5, next: '', todo: true });
             });
             renderMatrix();
             renderStakeholderList();
             const note = document.getElementById('importNote');
-            const skipped = picked.length - n;
+            const al = skipped ? ` ${skipped === 1 ? 'Eén betrokkene stond' : skipped + ' betrokkenen stonden'} er al.` : '';
             note.textContent = n
-                ? `${n} overgenomen als ‘nog in te schatten’: stel in het overzicht hun bijdrage en ‘wil meewerken’ in${skipped ? ` (${skipped} stond${skipped === 1 ? '' : 'en'} er al)` : ''}.`
-                : 'Die stonden er allemaal al.';
+                ? `${n === 1 ? 'Eén nieuwe betrokkene' : n + ' nieuwe betrokkenen'} overgenomen als ‘nog in te schatten’: stel in het overzicht hun bijdrage en ‘wil meewerken’ in.${al}`
+                : `Geen nieuwe betrokkenen.${al}`;
             note.hidden = false;
             clearTimeout(note._t); note._t = setTimeout(() => { note.hidden = true; }, 6000);
         }
@@ -2034,9 +2090,11 @@ const ocExport = (() => {
             measurer.style.cssText = 'position:absolute;visibility:hidden;font-size:0.75rem;font-weight:600;white-space:nowrap;padding:3px 6px;';
             document.body.appendChild(measurer);
 
+            // Een lang label wordt ingekort met "…" (de volle naam staat in het overzicht): zo blijft het binnen de radar en het scherm.
+            const LABEL_MAX = Math.max(60, Math.min(matrixWidth - 8, Math.max(140, matrixWidth * 0.62)));
             allPositions.forEach((pos) => {
                 measurer.textContent = pos.name;
-                const labelWidth = measurer.offsetWidth;
+                const labelWidth = Math.min(measurer.offsetWidth, LABEL_MAX);
                 const pointXPx = (pos.xPercent / 100) * matrixWidth;
                 const pointYPx = (pos.yPercent / 100) * matrixHeight;
                 const minX = labelWidth / 2 + 2, maxX = matrixWidth - labelWidth / 2 - 2;
@@ -2114,6 +2172,7 @@ const ocExport = (() => {
                 const label = document.createElement('div');
                 label.className = 'stakeholder-label';
                 label.textContent = pos.name;
+                label.style.maxWidth = pos.labelWidth + 'px';
                 label.style.left = pos.labelXPx + 'px';
                 label.style.top = pos.labelYPx + 'px';
                 label.style.transform = 'translate(-50%, -50%)';
@@ -2189,6 +2248,8 @@ const ocExport = (() => {
         /* Het veld "Wat speelt er?" groeit mee met de tekst */
         function fitWat(t) { t.style.height = 'auto'; t.style.height = Math.max(44, t.scrollHeight + 2) + 'px'; }
 
+        // Zijn de schuifjes bewogen sinds de vorige toevoeging? Zo niet, dan staan ze in de standaardstand (5 en 5).
+        let ocGeschoven = false;
         function addStakeholder() {
             const nameInput = document.getElementById('stakeholderName');
             const addBtn = document.getElementById('addStakeholder');
@@ -2213,7 +2274,8 @@ const ocExport = (() => {
             const next = document.getElementById('stakeholderNext').value.trim().slice(0, 140);
             const wat = document.getElementById('stakeholderWat').value.replace(/\s+/g, ' ').trim().slice(0, 200);
 
-            stakeholders.push(Object.assign({ name: name.slice(0, 80), contribution, willingness, next }, wat ? { wat } : {}));
+            stakeholders.push(Object.assign({ name: name.slice(0, NAAM_MAX), contribution, willingness, next }, wat ? { wat } : {}, ocGeschoven ? {} : { std: true }));
+            ocGeschoven = false;
             document.getElementById('stakeholderNext').value = '';
             document.getElementById('stakeholderWat').value = '';
 
@@ -2253,8 +2315,12 @@ const ocExport = (() => {
         /* Alles wissen, met Ongedaan zolang er intussen niets veranderde */
         const stateSig = () => JSON.stringify([document.getElementById('projectName').value, stakeholders]);
         async function wipeAll() {
-            if (!stakeholders.length && !document.getElementById('projectName').value.trim()) { ocToast('Er is nog niets om te wissen'); return; }
-            if (!(await ocConfirmWipe('Alles wissen in Betrokkenenradar? Alle betrokkenen en de projectnaam verdwijnen. Je kan dit nog ongedaan maken tot je iets anders doet.', 'Alles wissen'))) return;
+            // Na het wissen krijgt het naamveld weer de naam van het actieve project uit de app (als die er is). Dat zeggen we eerlijk.
+            const naamNu = document.getElementById('projectName').value.trim(), appNaam = String(ocProject('') || '').trim();
+            if (!stakeholders.length && (!naamNu || naamNu === appNaam)) { ocToast('Er is nog niets om te wissen'); return; }
+            const watNaam = !naamNu || naamNu === appNaam ? '' : appNaam ? ` De projectnaam wordt weer ‘${appNaam.length > 60 ? appNaam.slice(0, 59).trimEnd() + '…' : appNaam}’, de naam van je actieve project.` : ' De projectnaam verdwijnt ook.';
+            const watMensen = stakeholders.length ? 'Alle betrokkenen verdwijnen.' : 'Er staan nog geen betrokkenen op de radar.';
+            if (!(await ocConfirmWipe(`Alles wissen in Betrokkenenradar? ${watMensen}${watNaam} Je kan dit nog ongedaan maken tot je iets anders doet.`, 'Alles wissen'))) return;
             const snap = ocStoreSnapshot();
             reset();
             const sig = stateSig();
@@ -2273,6 +2339,7 @@ const ocExport = (() => {
         function reset() {
             stakeholders = [];
             isExample = false;
+            ocGeschoven = false;
             document.getElementById('projectName').value = ocProject('');
             document.getElementById('stakeholderName').value = '';
             document.getElementById('stakeholderNext').value = '';
@@ -2377,7 +2444,7 @@ const ocExport = (() => {
                 const sel = e.target.closest && e.target.closest('select[data-pos]');
                 if (sel) {
                     const x = stakeholders[+sel.dataset.i]; if (!x) return;
-                    x[sel.dataset.pos] = clamp10(sel.value); delete x.todo;
+                    x[sel.dataset.pos] = clamp10(sel.value); delete x.todo; delete x.std;
                     const key = sel.dataset.pos, idx = sel.dataset.i;
                     renderMatrix(); renderStakeholderList();
                     const again = document.querySelector(`select[data-pos="${key}"][data-i="${idx}"]`); if (again) again.focus();
@@ -2401,7 +2468,7 @@ const ocExport = (() => {
                 const del = e.target.closest('[data-del]');
                 if (del) { deleteStakeholder(+del.dataset.del); return; }
                 const ok = e.target.closest('[data-ok]');
-                if (ok && stakeholders[+ok.dataset.ok]) { delete stakeholders[+ok.dataset.ok].todo; renderMatrix(); renderStakeholderList(); }
+                if (ok && stakeholders[+ok.dataset.ok]) { delete stakeholders[+ok.dataset.ok].todo; delete stakeholders[+ok.dataset.ok].std; renderMatrix(); renderStakeholderList(); }
             });
             document.getElementById('migrateOk').addEventListener('click', () => {
                 document.getElementById('migrateNote').hidden = true;
@@ -2413,10 +2480,12 @@ const ocExport = (() => {
             document.addEventListener('visibilitychange', () => { if (!document.hidden) updateImportBtn(); });
 
             document.getElementById('powerSlider').addEventListener('input', e => {
+                ocGeschoven = true;
                 document.getElementById('powerValue').textContent = e.target.value;
             });
 
             document.getElementById('interestSlider').addEventListener('input', e => {
+                ocGeschoven = true;
                 document.getElementById('interestValue').textContent = e.target.value;
             });
 
@@ -2780,19 +2849,36 @@ ocBestandKnoppen({
     try { var mt = document.querySelector('meta[name="oc:opslag"]'), mz = mt && /oc\.share\.([\w-]+)/.exec(mt.content); zelf = mz ? mz[1] : ''; } catch (e) {}
     function esc(v) { return String(v).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function samenvatting(types) {
-      var tools = [], perType = {}, n = 0, keys = [];
+      var tools = [], perType = {}, n = 0, al = 0, keys = [], gezien = {}, heeft = {};
+      function norm(v) { return String(v || '').normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim().replace(/^[\s.,;:!?·-]+|[\s.,;:!?·-]+$/g, ''); }
       try { for (var i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i)); } catch (e) { return ''; }
+      // Wat de tool al heeft (window.ocHave), telt niet als nieuw
+      try { if (typeof window.ocHave === 'function') (window.ocHave(types) || []).forEach(function (x) { heeft[norm(x)] = 1; }); } catch (e) {}
+      // Zoals de kiezer: elke tekst van elke soort één keer, bij de rijkste bron (notitie, wie, wanneer), dan de grootste lijst, dan de recentste
+      var lijsten = [];
       keys.forEach(function (k) {
         if (!k || k.indexOf('oc.share.') !== 0 || k === 'oc.share.' + zelf) return;
-        try {
-          var d = JSON.parse(localStorage.getItem(k)), m = 0; if (!d || !Array.isArray(d.lists)) return;
-          d.lists.forEach(function (l) { (l && Array.isArray(l.items) ? l.items : []).forEach(function (it) {
-            if (it && types.indexOf(it.type) >= 0 && typeof it.text === 'string') { m++; perType[it.type] = (perType[it.type] || 0) + 1; }
-          }); });
-          if (m) { n += m; tools.push({ naam: String(d.tool || d.id || k.slice(9)), t: +d.updated || 0 }); }
+        try { var d = JSON.parse(localStorage.getItem(k)); if (!d || !Array.isArray(d.lists)) return;
+          d.lists.forEach(function (l) {
+            var its = (l && Array.isArray(l.items) ? l.items : []).filter(function (it) { return it && types.indexOf(it.type) >= 0 && typeof it.text === 'string' && it.text.trim(); });
+            if (its.length) lijsten.push({ naam: String(d.tool || d.id || ''), t: +d.updated || 0, items: its });
+          });
         } catch (e) {}
       });
-      if (!n) return '';
+      var best = {};
+      lijsten.forEach(function (l) { l.items.forEach(function (it) {
+        var s = it.type + '|' + norm(it.text), sc = [(it.note ? 2 : 0) + (it.who ? 1 : 0) + (it.when ? 1 : 0), l.items.length, l.t], e = best[s];
+        var beter = !e; for (var i = 0; !beter && e && i < 3; i++) { if (sc[i] !== e.sc[i]) { beter = sc[i] > e.sc[i]; break; } }
+        if (beter) best[s] = { sc: sc, l: l, type: it.type, tekst: it.text };
+      }); });
+      var perTool = {};
+      Object.keys(best).forEach(function (s) {
+        var b = best[s]; if (heeft[norm(b.tekst)]) { al++; return; }
+        n++; perType[b.type] = (perType[b.type] || 0) + 1;
+        var tl = perTool[b.l.naam] || (perTool[b.l.naam] = { naam: b.l.naam, t: 0 }); tl.t = Math.max(tl.t, b.l.t);
+      });
+      tools = Object.keys(perTool).map(function (k) { return perTool[k]; });
+      if (!n) return al ? 'Alles staat er al' : '';
       tools.sort(function (a, b) { return b.t - a.t; });
       var nm = tools.map(function (x) { return x.naam; }), soort = Object.keys(perType);
       var wat = soort.length === 1 && VEEL[soort[0]] ? n + ' ' + (n === 1 ? EEN[soort[0]] : VEEL[soort[0]]) : n + (n === 1 ? ' punt' : ' punten');
