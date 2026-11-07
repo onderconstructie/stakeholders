@@ -145,6 +145,7 @@
         /* Werk samen via een gedeeld bestand: de status staat onder de projectnaam (de stijl komt uit oc-koppel) */
         .kp { max-width: 640px; margin: -0.75rem auto 1.25rem; text-align: center; }
         .kp .kp-bar { text-align: left; }
+        .ptab .tab-deel { margin-right: 0; }
 
         .project-name-input {
             width: 100%;
@@ -1037,6 +1038,15 @@
         .vb-btn { min-height:44px; padding:0.375rem 0.625rem; border-radius:10px; font:inherit; font-size:0.875rem; font-weight:600; background:#fff; border:1px solid #e2e8f0; cursor:pointer; }
         .vb-wis { color:#b91c1c; border-color:#fecaca; }
         .vb-eigen { color:#047857; border-color:#a7f3d0; }
+        /* ===== Per project (tabbladen), zoals in de Risicomatrix ===== */
+        .proj-tabs { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; justify-content: safe center; padding: 0.125rem 0.25rem 0.25rem; margin: 0 0 0.75rem; }
+        .proj-tabs::-webkit-scrollbar { display: none; }
+        .ptab { flex-shrink: 0; min-height: 44px; padding: 0.4375rem 0.875rem; border-radius: 999px; font: inherit; font-size: 0.875rem; font-weight: 600; border: 1px solid var(--slate-200); background: var(--white); color: var(--slate-600); white-space: nowrap; display: flex; align-items: center; gap: 0.375rem; cursor: pointer; }
+        .ptab .n { font-size: 0.75rem; font-weight: 500; color: var(--slate-500); font-variant-numeric: tabular-nums; }
+        .ptab.active { background: var(--slate-800); border-color: var(--slate-800); color: var(--white); }
+        .ptab.active .n { color: var(--slate-300); }
+        .ptab.add { color: #047857; border-style: dashed; }
+        .ptab .vb-tag { font-size: 0.6875rem; font-weight: 600; padding: 0 0.375rem; border-radius: 999px; background: #fef3c7; color: #92400e; }
         /* Melding met Ongedaan, en de tekstknop "Opnieuw beginnen" */
         .oc-toast { position: fixed; left: 50%; bottom: 1.25rem; transform: translate(-50%, calc(100% + 3rem)); visibility: hidden; z-index: 10002;
             background: #1e293b; color: #ffffff; border-radius: 12px; padding: 0.375rem 0.375rem 0.375rem 1rem; min-height: 44px;
@@ -1275,9 +1285,10 @@ input::placeholder, textarea::placeholder { color:#64748b; opacity:1; }
     </header>
 
     <div class="container">
+        <nav class="proj-tabs" id="projTabs" aria-label="Projecten"></nav>
         <div class="project-bar oc-bar">
             <input data-oc-projectnaam type="text" class="project-name-input" id="projectName" placeholder="Projectnaam invullen..." autocomplete="off" enterkeyhint="done" aria-label="Projectnaam">
-            <div class="ocm-wrap"><button type="button" class="ocm-btn" id="ocMenuBtn" aria-label="Meer acties" aria-haspopup="true" aria-expanded="false" aria-controls="ocMenu"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button><div class="ocm" id="ocMenu" role="menu" aria-label="Meer acties"><button type="button" data-ocb="bewaar" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 11v6M9 14l3 3 3-3"/></svg><span class="ocm-t">Bewaar als bestand<small>Om later verder te werken, of door te geven</small></span></button><button type="button" data-ocb="open" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13l3-3 3 3"/></svg>Open bestand</button><div class="sep" role="separator"></div><button type="button" data-ocm="pdf" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15h6M9 18h4"/></svg>Download als PDF</button><button type="button" data-ocm="png" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Download als afbeelding</button><button type="button" data-ocm="csv" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h8M12 13v4"/></svg>Download als CSV</button><p class="ocm-note">Een afbeelding, PDF of CSV kan je niet terug openen.</p><div class="sep" role="separator"></div><button type="button" data-ocm="wipe" class="danger" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>Alles wissen</button></div></div>
+            <div class="ocm-wrap"><button type="button" class="ocm-btn" id="ocMenuBtn" aria-label="Meer acties" aria-haspopup="true" aria-expanded="false" aria-controls="ocMenu"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button><div class="ocm" id="ocMenu" role="menu" aria-label="Meer acties"><button type="button" data-ocb="bewaar" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 11v6M9 14l3 3 3-3"/></svg><span class="ocm-t">Bewaar als bestand<small>Om later verder te werken, of door te geven</small></span></button><button type="button" data-ocb="open" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13l3-3 3 3"/></svg>Open bestand</button><div class="sep" role="separator"></div><button type="button" data-ocm="pdf" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15h6M9 18h4"/></svg>Download als PDF</button><button type="button" data-ocm="png" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Download als afbeelding</button><button type="button" data-ocm="csv" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h8M12 13v4"/></svg>Download als CSV</button><p class="ocm-note">Een afbeelding, PDF of CSV kan je niet terug openen.</p><div class="sep" role="separator"></div><button type="button" data-ocm="del" class="danger" role="menuitem" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>Verwijder dit project</button><button type="button" data-ocm="wipe" class="danger" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>Alles wissen</button></div></div>
         </div>
         <div class="migrate-note" id="migrateNote" role="status" hidden>
             <span>De assen zijn nu bijdrage en wil meewerken. Kijk na of het klopt voor je betrokkenen.</span>
@@ -1290,7 +1301,7 @@ input::placeholder, textarea::placeholder { color:#64748b; opacity:1; }
             <div class="vb-btns"><button type="button" class="vb-btn vb-wis" id="vbWis">Wis voorbeeld</button><button type="button" class="vb-btn vb-eigen" id="vbEigen">Maak er mijn eigen van</button></div>
         </div>
 
-        <script>try { var sh0 = JSON.parse(localStorage.getItem('stakeholders.v1') || 'null'), sh1 = !!(sh0 && Array.isArray(sh0.items) && sh0.items.some(function (x) { return x && x.name; })); document.getElementById('vbStart').hidden = sh1; document.getElementById('vbBar').hidden = !(sh1 && sh0.voorbeeld === true); } catch (e) {}</script>
+        <script>try { var sh0 = JSON.parse(localStorage.getItem('stakeholders.v1') || 'null'); if (sh0 && Array.isArray(sh0.analyses)) sh0 = sh0.analyses.filter(function (x) { return x && x.id === sh0.huidig; })[0] || sh0.analyses[0]; var sh1 = !!(sh0 && Array.isArray(sh0.items) && sh0.items.some(function (x) { return x && x.name; })); document.getElementById('vbStart').hidden = sh1; document.getElementById('vbBar').hidden = !(sh1 && sh0.voorbeeld === true); } catch (e) {}</script>
         <div class="main-grid">
             <!-- Left: Form -->
             <div class="card">
@@ -2941,39 +2952,45 @@ const ocExport = (() => {
         /* ---------- Opslag en delen ---------- */
         const STORE_KEY = 'stakeholders.v1';
         let loaded = false;   // pas bewaren nadat de opgeslagen gegevens ingelezen zijn
-        /* ---------- Werk samen via een gedeeld bestand ----------
-           Het gedeelde blok oc-koppel werkt met een lijst analyses. Hier is er altijd één: je eigen analyse (id 'radar', op elk toestel
-           hetzelfde, zodat ze samengaat) of het voorbeeld (id 'voorbeeld', gaat nooit mee). Wie gekoppeld is, deelt zijn analyse.
-           De opslag blijft { model:2, project, items, voorbeeld? }, met pas na het koppelen ook gedeeld, gewijzigd,
-           weg (verwijderde betrokkenen: id: tijd) en wegAnalyses. */
+        /* ---------- Opslag: één analyse per project ----------
+           stakeholders.v1 = { model:3, analyses:[{ id, name, items, voorbeeld?, vorigProject?, gedeeld?, gewijzigd?, weg? }], huidig, weg?, ocSince? }.
+           Elk project heeft een eigen analyse, in een eigen tabblad, zoals in de Risicomatrix. kpS is dat geheel; het gedeelde blok
+           oc-koppel werkt er rechtstreeks op. kpE is de open analyse; stakeholders, isExample en het naamveld wijzen altijd naar kpE.
+           Vroeger had de radar één analyse ({ model:2, project, items, voorbeeld?, gedeeld?, gewijzigd?, weg?, wegAnalyses? }).
+           Die wordt het eerste project, met id 'radar' (het voorbeeld: 'voorbeeld'): wie al een gedeeld bestand koppelde, werkt zo
+           verder in dezelfde analyse. De koppelvelden (gedeeld, gewijzigd, weg, weg bovenaan) bestaan pas na het koppelen. */
         const kpS = { analyses: [], huidig: 'radar' };
         let kpE = null;
         const kpActief = () => !!(window.ocKoppel && ocKoppel.toestand().fase !== 'uit');
+        const shUid = () => Math.random().toString(36).slice(2, 10);
+        const nieuweAnalyse = naam => ({ id: shUid(), name: naam == null ? ocProject('Mijn project') : naam, items: [] });
+        // De open analyse bijwerken met wat er nu getoond wordt (naamveld, betrokkenen, voorbeeld)
         function kpZet() {
-            const id = isExample ? 'voorbeeld' : 'radar';
-            if (!kpE || kpE.id !== id) kpE = { id };
+            if (!kpE) kpVolg();
             kpE.name = document.getElementById('projectName').value;
             kpE.items = stakeholders;
-            if (isExample) kpE.voorbeeld = true; else delete kpE.voorbeeld;
-            if (!isExample && kpActief()) kpE.gedeeld = true;   // gekoppeld: je analyse gaat mee (er is er maar één)
-            kpS.analyses = [kpE]; kpS.huidig = id;
+            if (isExample) kpE.voorbeeld = true; else { delete kpE.voorbeeld; delete kpE.vorigProject; }
         }
-        // Een gedeeld bestand geopend met "Open bestand": de analyse eruit halen
-        function kpEnkel(d) {
-            if (!d || typeof d !== 'object' || !Array.isArray(d.analyses)) return d;
-            const u = d.analyses.find(x => x && x.id === 'radar') || d.analyses.find(x => x && typeof x === 'object');
-            return u ? Object.assign({ model: 2, project: typeof u.name === 'string' ? u.name : '', items: Array.isArray(u.items) ? u.items : [] },
-                u.gewijzigd ? { gewijzigd: u.gewijzigd } : {}, u.weg ? { weg: u.weg } : {}, d.weg ? { wegAnalyses: d.weg } : {}) : null;
+        // Omgekeerd: na laden, wisselen of samenvoegen tonen we de open analyse
+        function kpVolg() {
+            if (!kpS.analyses.length) kpS.analyses.push(nieuweAnalyse());
+            kpE = kpS.analyses.find(u => u.id === kpS.huidig) || kpS.analyses[0];
+            kpS.huidig = kpE.id;
+            stakeholders = kpE.items; isExample = kpE.voorbeeld === true;
+            const el = document.getElementById('projectName');
+            if (el && document.activeElement !== el) el.value = kpE.name || '';
         }
-        function kpLaad(d) {
-            kpE = null; delete kpS.weg;
-            kpZet();
-            if (!d || typeof d !== 'object') return;
+        // Eén analyse nakijken (uit de opslag of een bestand). Wat er verder in staat, blijft.
+        function analyse(u) {
+            if (!u || typeof u !== 'object' || Array.isArray(u)) return null;
             const W = window.ocKoppel ? ocKoppel.wegMap : null;
-            if (d.gedeeld === true && !isExample) kpE.gedeeld = true;
-            const g = Math.round(+d.gewijzigd); if (g > 0 && isFinite(g)) kpE.gewijzigd = g;
-            if (W && d.weg && typeof d.weg === 'object') { const w = W(d.weg); if (Object.keys(w).length) kpE.weg = Object.assign({}, w); }
-            if (W && d.wegAnalyses && typeof d.wegAnalyses === 'object') kpS.weg = Object.assign({}, W(d.wegAnalyses));
+            const items = Array.isArray(u.items) ? u.items.filter(x => x && typeof x === 'object' && x.name).map(normalize) : [];
+            const a = Object.assign({}, u, { id: typeof u.id === 'string' && /^[\w-]{1,40}$/.test(u.id) ? u.id : shUid(), name: typeof u.name === 'string' ? u.name.slice(0, 120) : '', items });
+            if (a.voorbeeld !== true || !items.length) { delete a.voorbeeld; delete a.vorigProject; }
+            if (a.gedeeld !== true || a.voorbeeld) delete a.gedeeld;
+            const g = Math.round(+u.gewijzigd); if (g > 0 && isFinite(g)) a.gewijzigd = g; else delete a.gewijzigd;
+            if (W) { const w = u.weg && typeof u.weg === 'object' ? W(u.weg) : {}; if (Object.keys(w).length) a.weg = Object.assign({}, w); else delete a.weg; }
+            return a;
         }
         function saveState() {
             if (!loaded) return;
@@ -2984,29 +3001,26 @@ const ocExport = (() => {
         }
         // Meteen bewaren en klaarleggen voor andere tools (ook na een samenvoeging, zonder nieuwe tijdstempels)
         function kpBewaarNu() {
-            const project = kpE ? kpE.name : document.getElementById('projectName').value;
-            const kp = kpE && kpS.weg ? Object.assign({}, kpE.gedeeld ? { gedeeld: true } : {}, kpE.gewijzigd ? { gewijzigd: kpE.gewijzigd } : {},
-                kpE.weg && Object.keys(kpE.weg).length ? { weg: kpE.weg } : {}, { wegAnalyses: kpS.weg }) : {};
-            try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({ model: 2, project, items: stakeholders }, isExample ? { voorbeeld: true } : {}, kp))); } catch (e) {}
-            if (isExample) { ocShare.clear('stakeholders'); updateImportBtn(); return; }
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({ model: 3 }, kpS))); } catch (e) {}
+            // Per project een lijst met de projectnaam: de betrokkenen en de kerncijfers van dat project. Een voorbeeld gaat nooit mee.
             // Wie uit een andere tool overgenomen werd (x.van), geven we pas door als je hem hier inschatte:
             // het vak in de radar is ons eigen oordeel. Zolang hij 'nog in te schatten' is, blijft de andere tool de baas.
-            ocShare.publish('stakeholders', 'Betrokkenenradar', [{
-                name: project.trim() || 'Betrokkenen',
-                items: stakeholders.filter(x => !(x.van && x.todo)).map(x => ({ type: 'betrokkene', text: x.name, note: shareNote(x) }))
-            }, {
-                name: 'Kerncijfers',
-                // Wie nog niet ingeschat is (bv. net overgenomen), telt niet mee in de kerncijfers.
-                items: assessed().length ? (() => {
-                    const done = assessed(), n = done.length;
-                    const ant = done.filter(x => qOf(x) === QUADS.anticipate).length;
-                    const man = done.filter(x => qOf(x) === QUADS.manage).length;
-                    const k = (t, v) => ({ type: 'kerncijfer', text: 'stakeholders.' + t, note: String(v) });
-                    return [k('aantal', n), k('anticiperen', ant), k('managen', man),
-                            k('tegen_invloedrijk', (ant / n).toFixed(2))].concat(project.trim() ? [k('project', project.trim())] : []);
-                })() : []
-            }]);
+            // De lijst 'Kerncijfers' (het open project) blijft voor wie de kerncijfers nog zonder projectnaam leest.
+            const lists = kpS.analyses.filter(u => !u.voorbeeld).map(u => ({ name: String(u.name || '').trim() || 'Betrokkenen',
+                items: u.items.filter(x => !(x.van && x.todo)).map(x => ({ type: 'betrokkene', text: x.name, note: shareNote(x) })).concat(kernVan(u)) }));
+            if (kpE && !kpE.voorbeeld) lists.push({ name: 'Kerncijfers', items: kernVan(kpE) });
+            ocShare.publish('stakeholders', 'Betrokkenenradar', lists);
             updateImportBtn();
+        }
+        // Wie nog niet ingeschat is (bv. net overgenomen), telt niet mee in de kerncijfers.
+        function kernVan(u) {
+            const done = u.items.filter(x => !x.todo), n = done.length, project = String(u.name || '').trim();
+            if (!n) return [];
+            const ant = done.filter(x => qOf(x) === QUADS.anticipate).length;
+            const man = done.filter(x => qOf(x) === QUADS.manage).length;
+            const k = (t, v) => ({ type: 'kerncijfer', text: 'stakeholders.' + t, note: String(v) });
+            return [k('aantal', n), k('anticiperen', ant), k('managen', man),
+                    k('tegen_invloedrijk', (ant / n).toFixed(2))].concat(project ? [k('project', project)] : []);
         }
         const assessed = () => stakeholders.filter(x => !x.todo);
         // Een naam mag lang zijn ("Céline Van den Bossche-Vermeiren, coördinator eerstelijnshulp en schuldbemiddeling"):
@@ -3020,21 +3034,67 @@ const ocExport = (() => {
             return t.length > 200 ? t.slice(0, 199).trimEnd() + '…' : t;
         }
         function loadState() {
-            let kpD = null;
+            let d = null; try { d = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) {}
+            kpS.analyses = []; kpS.huidig = ''; delete kpS.weg; delete kpS.ocSince; kpE = null;
+            const W = window.ocKoppel ? ocKoppel.wegMap : null, rauw = [];
             try {
-                const d = kpEnkel(JSON.parse(localStorage.getItem(STORE_KEY)));
-                kpD = d && Array.isArray(d.items) ? d : null;
-                if (d && Array.isArray(d.items)) {
-                    stakeholders = d.items.filter(x => x && x.name).map(normalize);
-                    isExample = d.voorbeeld === true && stakeholders.length > 0;
-                    document.getElementById('projectName').value = d.project || '';
-                    if (d.items.some(x => x && ('power' in x || 'interest' in x) && !('contribution' in x))) showMigrateNote();
+                if (d && typeof d === 'object' && Array.isArray(d.analyses)) {
+                    // nieuw formaat, of een gedeeld bestand geopend met "Open bestand" ({ analyses, weg })
+                    const ids = new Set();
+                    kpS.analyses = d.analyses.map(analyse).filter(a => a && !ids.has(a.id) && ids.add(a.id));
+                    d.analyses.forEach(u => { if (u && Array.isArray(u.items)) rauw.push(...u.items); });
+                    if (typeof d.huidig === 'string') kpS.huidig = d.huidig;
+                    if (W && d.weg && typeof d.weg === 'object') kpS.weg = Object.assign({}, W(d.weg));
+                    if (typeof d.ocSince === 'string') kpS.ocSince = d.ocSince;
+                } else if (d && typeof d === 'object' && Array.isArray(d.items)) {
+                    // oud formaat: één analyse. De naam die ze had; zonder naam die van het project in de app (als er iemand op staat), anders "Mijn project".
+                    const { project, items, wegAnalyses, model, ...rest } = d;
+                    const a = analyse(Object.assign({}, rest, { id: d.voorbeeld === true ? 'voorbeeld' : 'radar', name: typeof project === 'string' ? project : '', items }));
+                    if (!a.name.trim() && !a.voorbeeld) a.name = a.items.length ? ocProject('Mijn project') : 'Mijn project';
+                    kpS.analyses = [a]; kpS.huidig = a.id; rauw.push(...items);
+                    if (W && wegAnalyses && typeof wegAnalyses === 'object') kpS.weg = Object.assign({}, W(wegAnalyses));
                 }
-            } catch (e) {}
-            if (!document.getElementById('projectName').value) document.getElementById('projectName').value = ocProject('');
-            kpLaad(kpD);
+            } catch (e) { kpS.analyses = []; }
+            if (rauw.some(x => x && typeof x === 'object' && ('power' in x || 'interest' in x) && !('contribution' in x))) showMigrateNote();
+            if (!kpS.analyses.length) { const a = nieuweAnalyse(); kpS.analyses = [a]; kpS.huidig = a.id; }
+            if (!kpS.analyses.some(a => a.id === kpS.huidig)) kpS.huidig = (kpS.analyses.find(a => !a.voorbeeld) || kpS.analyses[0]).id;
+            ocPickProject(kpS, 'analyses', 'huidig');   // het actieve project uit de app openen
+            kpVolg();
             loaded = true;
         }
+        // Een ander project gekozen in de app en nog geen analyse ervoor: begin er een, zoals met "+ Project". De vorige blijft in haar tabblad.
+        function ocNieuwProject() { const n = ocProjectNieuw(kpS, 'analyses', { cur: 'huidig', leeg: a => !a.items.length }); if (n) { const a = nieuweAnalyse(n); kpS.analyses.push(a); kpS.huidig = a.id; } return !!n; }
+        /* Projecten: tabs zoals in de Risicomatrix */
+        function renderTabs() {
+            const el = document.getElementById('projTabs'); if (!el) return;
+            el.innerHTML = kpS.analyses.map(u => `<button type="button" class="ptab${u === kpE ? ' active' : ''}" data-proj="${ocEsc(u.id)}"${u === kpE ? ' aria-current="true"' : ''}>${window.ocKoppel ? ocKoppel.icoon(u) : ''}${ocEsc(String(u.name || '').trim() || 'Naamloos')}${u.voorbeeld ? '<span class="vb-tag">voorbeeld</span>' : ''}<span class="n">${u.items.length || ''}</span></button>`).join('')
+                + '<button type="button" class="ptab add" id="newProj">+ Project</button>';
+            if (window.ocKoppel) ocKoppel.toon();   // gekoppeld: het icoon in de tab en of dit project gedeeld is
+        }
+        function switchProject(id) {
+            saveState();
+            kpS.huidig = id; kpVolg(); clearNameErr();
+            renderMatrix(); renderStakeholderList();
+        }
+        function newProject() {
+            saveState();
+            const a = nieuweAnalyse('Nieuw project');
+            kpS.analyses.push(a); kpS.huidig = a.id; kpVolg(); clearNameErr();
+            renderMatrix(); renderStakeholderList();
+            const n = document.getElementById('projectName'); n.focus(); n.select();
+            requestAnimationFrame(() => { const t = document.querySelector('.ptab.active'); t && t.scrollIntoView({ inline: 'nearest', block: 'nearest' }); });
+        }
+        // Eén project verwijderen (als er meer zijn): meteen, met Ongedaan
+        function deleteProject() {
+            if (kpS.analyses.length < 2) return;
+            saveState();
+            const snap = JSON.stringify({ analyses: kpS.analyses, huidig: kpS.huidig }), u = kpE, i = kpS.analyses.indexOf(u);
+            kpS.analyses.splice(i, 1);
+            kpS.huidig = kpS.analyses[Math.max(0, i - 1)].id; kpVolg();
+            renderMatrix(); renderStakeholderList();
+            ocToast(`${String(u.name || '').trim() || 'Naamloos'} verwijderd`, () => { const s = JSON.parse(snap); kpS.analyses = s.analyses; kpS.huidig = s.huidig; kpVolg(); renderMatrix(); renderStakeholderList(); ocToast('Teruggezet'); });
+        }
+        function clearNameErr() { const n = document.getElementById('stakeholderName'); if (n) { n.removeAttribute('aria-invalid'); const e = document.getElementById('nameErr'); if (e) e.textContent = ''; } }
         /* Oude gegevens (macht/belang, schaal 0–10) omzetten: macht → bijdrage, belang → bereidheid, schaal 1–10. */
         function normalize(x) {
             const old = !('contribution' in x) && ('power' in x || 'interest' in x);
@@ -3380,6 +3440,7 @@ const ocExport = (() => {
         }
         function renderStakeholderList() {
             saveState();
+            renderTabs();
             renderFirstBox();
             const container = document.getElementById('stakeholderList');
             const countEl = document.getElementById('stakeholderCount');
@@ -3491,13 +3552,13 @@ const ocExport = (() => {
         }
 
         /* Alles wissen, met Ongedaan zolang er intussen niets veranderde */
-        const stateSig = () => JSON.stringify([document.getElementById('projectName').value, stakeholders]);
+        const stateSig = () => JSON.stringify([document.getElementById('projectName').value, stakeholders, kpS.analyses.length]);
         async function wipeAll() {
             // Na het wissen krijgt het naamveld weer de naam van het actieve project uit de app (als die er is). Dat zeggen we eerlijk.
-            const naamNu = document.getElementById('projectName').value.trim(), appNaam = String(ocProject('') || '').trim();
-            if (!stakeholders.length && (!naamNu || naamNu === appNaam)) { ocToast('Er is nog niets om te wissen'); return; }
-            const watNaam = !naamNu || naamNu === appNaam ? '' : appNaam ? ` De projectnaam wordt weer ‘${appNaam.length > 60 ? appNaam.slice(0, 59).trimEnd() + '…' : appNaam}’, de naam van je actieve project.` : ' De projectnaam verdwijnt ook.';
-            const watMensen = stakeholders.length ? 'Alle betrokkenen verdwijnen.' : 'Er staan nog geen betrokkenen op de radar.';
+            const naamNu = document.getElementById('projectName').value.trim(), appNaam = String(ocProject('') || '').trim(), veel = kpS.analyses.length > 1;
+            if (!veel && !stakeholders.length && (!naamNu || naamNu === appNaam)) { ocToast('Er is nog niets om te wissen'); return; }
+            const watNaam = veel || !naamNu || naamNu === appNaam ? '' : appNaam ? ` De projectnaam wordt weer ‘${appNaam.length > 60 ? appNaam.slice(0, 59).trimEnd() + '…' : appNaam}’, de naam van je actieve project.` : ' De projectnaam verdwijnt ook.';
+            const watMensen = veel ? `Alle ${kpS.analyses.length} projecten en hun betrokkenen verdwijnen.` : stakeholders.length ? 'Alle betrokkenen verdwijnen.' : 'Er staan nog geen betrokkenen op de radar.';
             if (!(await ocConfirmWipe(`Alles wissen in Betrokkenenradar? ${watMensen}${watNaam} Je kan dit nog ongedaan maken tot je iets anders doet.`, 'Alles wissen'))) return;
             const snap = ocStoreSnapshot();
             // De koppeling met een gedeeld bestand gaat mee weg. Het bestand zelf blijft staan.
@@ -3519,11 +3580,10 @@ const ocExport = (() => {
         }
 
         function reset() {
-            kpE = null; delete kpS.weg;
-            stakeholders = [];
-            isExample = false;
+            const a = nieuweAnalyse(ocProject(''));
+            kpS.analyses = [a]; kpS.huidig = a.id; delete kpS.weg; delete kpS.ocSince; kpE = null; kpVolg();
             ocGeschoven = false;
-            document.getElementById('projectName').value = ocProject('');
+            document.getElementById('projectName').value = a.name;
             document.getElementById('stakeholderName').value = '';
             document.getElementById('stakeholderNext').value = '';
             document.getElementById('stakeholderWat').value = '';
@@ -3543,18 +3603,25 @@ const ocExport = (() => {
         function renderExample() {
             document.getElementById('vbStart').hidden = stakeholders.length > 0;
             document.getElementById('vbBar').hidden = !isExample;
-            // Eén plek om te wissen: "Opnieuw beginnen", zodra er iemand op de radar staat.
-            document.getElementById('restartRow').hidden = stakeholders.length === 0;
+            // Eén plek om te wissen: "Opnieuw beginnen", zodra er iemand op de radar staat. Met meer projecten: dit project verwijderen.
+            const veel = kpS.analyses.length > 1, rb = document.getElementById('ocRestart');
+            rb.textContent = veel ? 'Verwijder dit project' : 'Opnieuw beginnen';
+            rb.title = veel ? 'Dit project en zijn betrokkenen verwijderen' : 'Alles wissen en opnieuw beginnen';
+            document.getElementById('restartRow').hidden = veel ? false : stakeholders.length === 0;
             // Gekoppeld: geen voorbeeld. Het zou de gedeelde analyse vervangen.
             const kp = kpActief(), vl = document.getElementById('vbLoad'), sp = document.querySelector('#vbStart > p:first-child');
             if (vl) vl.hidden = kp;
             if (sp) sp.textContent = kp ? 'Nog niemand op de radar. Begin met je eerste betrokkene.' : 'Nog niemand op de radar. Begin met je eerste betrokkene, of bekijk eerst een ingevuld voorbeeld.';
         }
-        let projectBeforeExample = '';
         function loadExample() {
-            if (stakeholders.length || kpActief()) return;
+            if (kpActief()) return;
+            // Is er al een voorbeeld, dan ga je ernaartoe. Een lege analyse wordt het voorbeeld; anders krijgt het een eigen tabblad.
+            const al = kpS.analyses.find(u => u.voorbeeld);
+            if (al) { switchProject(al.id); ocToast('Dit is het voorbeeld'); return; }
+            saveState();
+            if (stakeholders.length) { const a = nieuweAnalyse(''); kpS.analyses.push(a); kpS.huidig = a.id; kpVolg(); }
+            else kpE.vorigProject = document.getElementById('projectName').value;
             const S = (name, contribution, willingness, next, wat) => Object.assign({ name, contribution, willingness, next }, wat ? { wat } : {});
-            projectBeforeExample = document.getElementById('projectName').value;
             stakeholders = [
                 S('Afdelingshoofd', 9, 8, 'Wekelijks kort overleg over de planning'),
                 S('ICT-dienst', 8, 3, 'Gesprek over capaciteit en de koppeling met het oude systeem', 'Heeft dit jaar al veel projecten lopen. Vreest dat de koppeling met het oude systeem te veel tijd vraagt.'),
@@ -3564,20 +3631,21 @@ const ocExport = (() => {
                 S('Aanvragers', 3, 7, 'Korte bevraging na de eerste aanvragen', 'Willen sneller weten of hun aanvraag in orde is.'),
                 S('Vakbond', 3, 3, 'Toelichten op het formeel overleg, vóór de beslissing', 'Wil weten of de nieuwe werkwijze jobs of uurroosters verandert.')
             ];
-            isExample = true;
+            isExample = true; kpE.voorbeeld = true;
             document.getElementById('projectName').value = 'Digitaal premieloket voor renovatie';
             renderMatrix(); renderStakeholderList();
             ocToast('Voorbeeld geladen');
         }
         function clearExample() {
-            const before = { items: stakeholders, project: document.getElementById('projectName').value };
-            stakeholders = []; isExample = false;
-            document.getElementById('projectName').value = projectBeforeExample || ocProject('');
+            saveState();
+            const snap = JSON.stringify({ analyses: kpS.analyses, huidig: kpS.huidig }), u = kpE, i = kpS.analyses.indexOf(u);
+            // Kwam het voorbeeld in de plaats van een lege analyse, dan komt die terug met haar naam. Anders verdwijnt het tabblad.
+            if (typeof u.vorigProject === 'string' || kpS.analyses.length === 1) { const a = nieuweAnalyse(u.vorigProject || undefined); kpS.analyses[i] = a; kpS.huidig = a.id; }
+            else { kpS.analyses.splice(i, 1); kpS.huidig = kpS.analyses[Math.max(0, i - 1)].id; }
+            kpE = null; kpVolg();
             renderMatrix(); renderStakeholderList();
             ocToast('Voorbeeld gewist', () => {
-                if (stakeholders.length) return;
-                stakeholders = before.items; isExample = true;
-                document.getElementById('projectName').value = before.project;
+                const s = JSON.parse(snap); kpS.analyses = s.analyses; kpS.huidig = s.huidig; kpE = null; kpVolg();
                 renderMatrix(); renderStakeholderList();
             });
         }
@@ -3601,7 +3669,7 @@ const ocExport = (() => {
         document.addEventListener('click', e => {
             const b = e.target.closest('#ocMenu [data-ocm]'); if (!b) return;
             const a = b.dataset.ocm;
-            if (a === 'wipe') wipeAll(); else menuDownload(a);
+            if (a === 'wipe') wipeAll(); else if (a === 'del') deleteProject(); else menuDownload(a);
         });
 
         function downloadCsv() {
@@ -3620,17 +3688,27 @@ const ocExport = (() => {
         }
 
         // Event listeners
-        // Eén radar, geen tabbladen: nog niemand op de radar, dan volgt de projectnaam het project uit de app. Met betrokkenen blijft alles staan (ook gekoppeld).
-        function ocVolgProject() { const n = ocProject(''), el = document.getElementById('projectName'); if (!n || !loaded || stakeholders.length || isExample || el.value.trim() === n || document.activeElement === el || (window.ocKoppel && ocKoppel.toestand && ocKoppel.toestand().fase !== 'uit')) return false; el.value = n; return true; }
-        ocProjectVolg(() => { if (ocVolgProject()) { saveState(); renderMatrix(); renderStakeholderList(); } });   // open in de app en daar een ander project gekozen
+        // Open in de app en daar een ander project gekozen: dat project openen, of er een analyse voor beginnen. De vorige blijft in haar tabblad.
+        ocProjectVolg(() => {
+            if (!loaded) return;
+            kpZet(); const voor = JSON.stringify(kpS);
+            ocPickProject(kpS, 'analyses', 'huidig'); ocNieuwProject();
+            if (JSON.stringify(kpS) !== voor) { kpVolg(); clearNameErr(); renderMatrix(); renderStakeholderList(); }
+        });
+        // ⋮-menu: "Verwijder dit project" alleen als er meer dan één is
+        window.ocMenuVoorOpen = m => { const d = m.querySelector('[data-ocm="del"]'); if (d) d.hidden = kpS.analyses.length < 2; };
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
-            ocVolgProject();
+            ocNieuwProject(); kpVolg();   // na het laden: nieuw project in de app, nieuwe analyse (of de lege krijgt de naam)
             if (window.kpStart) kpStart();
             renderMatrix();
             renderStakeholderList();
             updateImportBtn();
-            document.getElementById('projectName').addEventListener('input', saveState);
+            document.getElementById('projectName').addEventListener('input', () => { saveState(); renderTabs(); });
+            document.getElementById('projTabs').addEventListener('click', e => {
+                if (e.target.closest('#newProj')) { newProject(); return; }
+                const t = e.target.closest('[data-proj]'); if (t && t.dataset.proj !== kpS.huidig) switchProject(t.dataset.proj);
+            });
             document.getElementById('importBtn').addEventListener('click', importStakeholders);
             document.getElementById('stakeholderList').addEventListener('change', e => {
                 const sel = e.target.closest && e.target.closest('select[data-pos]');
@@ -3692,7 +3770,7 @@ const ocExport = (() => {
                 if (e.key === 'Enter') addStakeholder();
             });
 
-            document.getElementById('ocRestart').addEventListener('click', wipeAll);
+            document.getElementById('ocRestart').addEventListener('click', () => { if (kpS.analyses.length > 1) deleteProject(); else wipeAll(); });
             document.getElementById('ocBegin').addEventListener('click', () => { const n = document.getElementById('stakeholderName'); n.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); n.focus({ preventScroll: true }); });
             document.getElementById('vbLoad').addEventListener('click', loadExample);
             document.getElementById('vbWis').addEventListener('click', clearExample);
@@ -3764,8 +3842,9 @@ const ocExport = (() => {
     </script>
 <script>
 /* ---------- Werk samen via een gedeeld bestand: de adapter voor het gedeelde blok oc-koppel ----------
-   De Betrokkenenradar heeft één analyse. Die is de eenheid: op elk toestel met hetzelfde id ('radar'), zodat ze samengaat.
-   Het voorbeeld (id 'voorbeeld') gaat nooit mee. Wie koppelt, deelt zijn analyse (er is er maar één): er valt niets te kiezen (enkel).
+   Eén project = één analyse = één eenheid, zoals de projecten in de Risicomatrix. Bij het koppelen vink je aan welke projecten meegaan.
+   De analyse van vroeger (van voor er meerdere projecten waren) houdt het id 'radar': wie al koppelde, werkt zo verder in dezelfde
+   analyse. Het voorbeeld gaat nooit mee.
    De items zijn de betrokkenen. Een betrokkene herken je aan zijn naam (de radar laat geen twee keer dezelfde naam toe, en een
    naam pas je niet aan): voegen twee mensen tegelijk dezelfde persoon toe, dan staat die er één keer. Passen twee mensen dezelfde
    betrokkene aan, dan wint wie het laatst bewaart. De projectnaam: de laatste wint. De volgorde volgt die van het bestand;
@@ -3777,16 +3856,7 @@ const ocExport = (() => {
     for (let i = 0; i < t.length; i++) a = ((a << 5) + a + t.charCodeAt(i)) | 0;
     return 'b-' + t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24) + '-' + (a >>> 0).toString(36);
   };
-  // Na een samenvoeging: de radar toont de gedeelde analyse (een voorbeeld maakt er plaats voor)
-  function kpVolg() {
-    let L = kpS.analyses;
-    if (L.length > 1) { const k = L.find(u => u.gedeeld === true && !u.voorbeeld) || L.find(u => u.id === kpS.huidig) || L[0]; kpS.analyses = L = [k]; }
-    const u = L[0]; if (!u) return;
-    kpE = u; kpS.huidig = u.id;
-    stakeholders = u.items; isExample = u.voorbeeld === true;
-    const el = document.getElementById('projectName');
-    if (el && document.activeElement !== el) el.value = u.name || '';
-  }
+  // Na een samenvoeging wijzen stakeholders, isExample en het naamveld weer naar de open analyse: kpVolg() (hierboven).
   window.kpStart = () => {
     ocKoppel.start({
       id:'stakeholders', soort:'oc-betrokkenenradar', naam:'Betrokkenenradar', bestand:'betrokkenenradar',
@@ -3794,19 +3864,18 @@ const ocExport = (() => {
       vlag:'gedeeld', huidig:'huidig', kopVelden:['name'], volgorde:'bestand', naamKoppel:false,
       w:{ een:'analyse', veel:'analyses', Een:'Een', De:'De', Deze:'Deze analyse', deze:'deze analyse', Hij:'Ze', werk:'werk', zelfde:'betrokkenen', item:['betrokkene', 'betrokkenen'] },
       max:{ eenheden:200, items:1000 },
-      enkel:true,                                              // één analyse: die gaat mee, er valt niets te kiezen
       uitleg:'Voegen twee mensen tegelijk dezelfde naam toe, dan staat die er één keer. Passen twee mensen dezelfde betrokkene aan, dan wint wie het laatst bewaart.',
       staat:() => kpS,
-      schoonEenheid:u => u && u.id === 'radar' ? u : null,       // alleen de eigen analyse, nooit een voorbeeld
+      schoonEenheid:u => u && u.voorbeeld !== true ? u : null,   // nooit een voorbeeld
       kopSchoon:(u, H) => ({ name:H.str(u.name, 120) }),
       schoonItem:(v, x) => { if (!x || typeof x.name !== 'string' || !x.name.trim()) return null; const o = normalize(x); delete o.gewijzigd; return o; },
       label:u => (u.name || '').trim() || 'Betrokkenen',
       naamVoorBestand:u => u ? u.name : '',
       aantal:u => `${u.items.length} ${u.items.length === 1 ? 'betrokkene' : 'betrokkenen'}`,
-      leeg:() => false,
-      nieuweEenheid:() => ({ id:'radar', name:ocProject(''), items:[] }),
-      kiesHuidig:() => { kpS.huidig = (kpS.analyses.find(u => u.gedeeld === true) || kpS.analyses[0] || {}).id || 'radar'; },
-      bewaar:() => { kpVolg(); kpBewaarNu(); renderExample(); },
+      leeg:u => !u.items.length,
+      nieuweEenheid:() => nieuweAnalyse(),
+      kiesHuidig:() => { kpS.huidig = (kpS.analyses.find(u => !u.voorbeeld) || kpS.analyses[0] || {}).id; },
+      bewaar:() => { kpVolg(); kpBewaarNu(); renderExample(); renderTabs(); },
       teken:() => { kpVolg(); renderMatrix(); renderStakeholderList(); },
       bezig:() => {
         if (document.querySelector('.ocw-back, .kp-back, .ocs-back')) return true;
@@ -3822,6 +3891,7 @@ const ocExport = (() => {
       ongedaan:() => ocToast.huidig(),
       menu:{ na:() => document.querySelector('#ocMenu [data-ocb="open"]'), tekst:'ocm-t', sluit:() => { if (window.ocMenuSluit) window.ocMenuSluit(); }, knop:() => document.getElementById('ocMenuBtn') },
       plek:() => document.querySelector('.project-bar'),
+      tabs:() => [...document.querySelectorAll('.ptab[data-proj]')].map(t => [t, t.dataset.proj]),
       open:{ knop:'[data-ocb="open"]', invoer:'ocbInput' },
       // De knop "Voorbeeld bekijken" volgt of je gekoppeld bent
       naFase:() => renderExample()
@@ -3920,9 +3990,9 @@ function ocBestandKnoppen(cfg) {
   });
 }
 ocBestandKnoppen({
-  heeftWerk: function () { return stakeholders.length > 0; },
+  heeftWerk: function () { return kpS.analyses.some(function (u) { return u.items.length > 0; }); },
   flush: function () { saveState(); },
-  extraNaam: function () { return document.getElementById('projectName').value; },
+  extraNaam: function () { return kpS.analyses.length === 1 ? document.getElementById('projectName').value : ''; },
   bevestig: function (t) { return ocConfirmWipe(t, 'Vervang'); },
   toast: function (t) { ocToast(t); }
 });
