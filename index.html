@@ -4693,6 +4693,12 @@ const ocExport = (() => {
                     renderMatrix();
                 }, 100);
             });
+            // Was de matrix verborgen toen ze getekend werd (bv. net na "Voorbeeld bekijken"), dan had ze geen breedte
+            // en stonden alle namen op een hoopje linksboven. Krijgt ze een (andere) breedte, dan tekenen we opnieuw.
+            try {
+                const mc = document.getElementById('matrixContainer'); let mw = mc ? mc.getBoundingClientRect().width : 0;
+                if (mc && window.ResizeObserver) new ResizeObserver(() => { const w = mc.getBoundingClientRect().width; if (Math.abs(w - mw) < 1) return; mw = w; if (w > 0) requestAnimationFrame(renderMatrix); }).observe(mc);
+            } catch (e) {}
         });
     </script>
 <script>
