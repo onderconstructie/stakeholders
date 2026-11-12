@@ -2366,7 +2366,8 @@ window.ocProjectkiezer = function (plek, o) {
         <p class="quote oc-quote">Begrijp wie ertoe doet, en geef aandacht waar het telt.</p>
     </footer>
 
-    <div class="tooltip" id="tooltip" role="tooltip"></div>
+    <div class="tooltip" id="tooltip"></div>
+    <script>(function () { var t = document.getElementById('tooltip'); if (!t || !window.MutationObserver) return; new MutationObserver(function () { t.textContent.trim() ? t.setAttribute('role', 'tooltip') : t.removeAttribute('role'); }).observe(t, { childList: true, characterData: true, subtree: true }); })();</script>
     <input type="file" id="ocbInput" accept=".json,application/json" hidden aria-label="Bestand kiezen om te openen">
 
 <script>
